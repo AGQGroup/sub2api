@@ -15,12 +15,29 @@
 
 [data-surface^='getoneapi-'] {
   --g1-link: #005eb8;
+  --g1-link-hover: #004c99;
   --g1-primary-button-hover: #0068d1;
 }
 
 .dark [data-surface^='getoneapi-'] {
   --g1-link: #409cff;
+  --g1-link-hover: #64d2ff;
   --g1-primary-button-hover: var(--g1-primary-hover);
+}
+
+[data-surface^='getoneapi-'] a {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+}
+
+[data-surface^='getoneapi-'] a:not(.g1-brand) {
+  color: var(--g1-link);
+}
+
+[data-surface^='getoneapi-'] a:not(.g1-brand):hover {
+  color: var(--g1-link-hover);
 }
 
 [data-surface^='getoneapi-'] button:hover,

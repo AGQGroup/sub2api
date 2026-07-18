@@ -117,7 +117,9 @@ function closeOnOutsideClick(event: MouseEvent): void {
 }
 
 function closeOnFocusOut(event: FocusEvent): void {
-  if (!menuRoot.value?.contains(event.relatedTarget as Node | null)) closeMenu(false)
+  const nextTarget = event.relatedTarget as Node | null
+  const returnedToTrigger = event.target !== triggerButton.value && nextTarget === triggerButton.value
+  if (returnedToTrigger || !menuRoot.value?.contains(nextTarget)) closeMenu(false)
 }
 
 onMounted(() => document.addEventListener('click', closeOnOutsideClick))

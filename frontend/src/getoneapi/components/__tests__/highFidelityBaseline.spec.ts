@@ -261,6 +261,20 @@ describe('GetOneAPI high-fidelity component baseline', () => {
     expect(document.activeElement).toBe(theme.get('[data-theme-mode="dark"]').element)
     expect(document.documentElement.classList.contains('dark')).toBe(true)
     expect(localStorage.getItem('theme')).toBe('dark')
+
+    const dark = theme.get('[data-theme-mode="dark"]')
+    await dark.trigger('keydown', { key: 'ArrowLeft' })
+    expect(light.attributes('aria-checked')).toBe('true')
+    expect(document.activeElement).toBe(light.element)
+
+    await light.trigger('keydown', { key: 'End' })
+    const system = theme.get('[data-theme-mode="system"]')
+    expect(system.attributes('aria-checked')).toBe('true')
+    expect(document.activeElement).toBe(system.element)
+
+    await system.trigger('keydown', { key: 'Home' })
+    expect(light.attributes('aria-checked')).toBe('true')
+    expect(document.activeElement).toBe(light.element)
   })
 
   it('supports vertical arrow-key selection in the theme segmented control', async () => {
@@ -288,7 +302,7 @@ describe('GetOneAPI high-fidelity component baseline', () => {
     const trigger = language.get('[data-ui="language-trigger"]')
 
     expect(trigger.attributes('aria-label')).not.toBe('')
-    await trigger.trigger('click')
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
     expect(language.text()).toContain('English')
     expect(language.text()).toContain('中文')
     expect(language.text()).not.toMatch(/[\u{1F1E6}-\u{1F1FF}]/u)
@@ -297,16 +311,25 @@ describe('GetOneAPI high-fidelity component baseline', () => {
     expect(document.activeElement).toBe(language.get('[data-locale="en"]').element)
     await language.get('[data-locale="en"]').trigger('keydown', { key: 'ArrowDown' })
     expect(document.activeElement).toBe(language.get('[data-locale="zh"]').element)
-    await language.get('[data-locale="zh"]').trigger('keydown', { key: 'Escape' })
+    await language.get('[data-locale="zh"]').trigger('keydown', { key: 'ArrowUp' })
+    expect(document.activeElement).toBe(language.get('[data-locale="en"]').element)
+    await language.get('[data-locale="en"]').trigger('keydown', { key: 'End' })
+    expect(document.activeElement).toBe(language.get('[data-locale="zh"]').element)
+    await language.get('[data-locale="zh"]').trigger('keydown', { key: 'Home' })
+    expect(document.activeElement).toBe(language.get('[data-locale="en"]').element)
+    await language.get('[data-locale="en"]').trigger('keydown', { key: 'Escape' })
     expect(document.activeElement).toBe(trigger.element)
 
-    await trigger.trigger('click')
+    await trigger.trigger('keydown', { key: 'ArrowUp' })
+    await flushPromises()
+    expect(document.activeElement).toBe(language.get('[data-locale="zh"]').element)
 
     await language.get('[data-locale="zh"]').trigger('click')
     expect(setLocaleMock).toHaveBeenCalledWith('zh')
+    expect(document.activeElement).toBe(trigger.element)
   })
 
-  it('closes the language menu when focus moves outside it', async () => {
+  it('closes the language menu after natural forward and reverse Tab focus movement', async () => {
     const outsideButton = document.createElement('button')
     document.body.appendChild(outsideButton)
     const language = mount(LanguageMenu, {
@@ -315,10 +338,36 @@ describe('GetOneAPI high-fidelity component baseline', () => {
     })
     const trigger = language.get('[data-ui="language-trigger"]')
 
-    await trigger.trigger('click')
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
     await flushPromises()
     expect(language.find('[role="menu"]').exists()).toBe(true)
 
+    const firstOption = language.get('[data-locale="en"]')
+    const reverseTab = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      shiftKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    firstOption.element.dispatchEvent(reverseTab)
+    expect(reverseTab.defaultPrevented).toBe(false)
+    ;(trigger.element as HTMLButtonElement).focus()
+    await flushPromises()
+
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(language.find('[role="menu"]').exists()).toBe(false)
+    expect(document.activeElement).toBe(trigger.element)
+
+    await trigger.trigger('keydown', { key: 'ArrowUp' })
+    await flushPromises()
+    const lastOption = language.get('[data-locale="zh"]')
+    const forwardTab = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      bubbles: true,
+      cancelable: true,
+    })
+    lastOption.element.dispatchEvent(forwardTab)
+    expect(forwardTab.defaultPrevented).toBe(false)
     outsideButton.focus()
     await flushPromises()
 
@@ -352,6 +401,18 @@ describe('GetOneAPI high-fidelity component baseline', () => {
     ;(activeTab.element as HTMLButtonElement).focus()
     await activeTab.trigger('keydown', { key: 'ArrowRight' })
     expect(catalog.get('[role="tab"][aria-selected="true"]').text()).toBe('Secondary')
+    expect(document.activeElement).toBe(catalog.get('[role="tab"][aria-selected="true"]').element)
+
+    await catalog.get('[role="tab"][aria-selected="true"]').trigger('keydown', { key: 'ArrowLeft' })
+    expect(catalog.get('[role="tab"][aria-selected="true"]').text()).toBe('General access')
+    expect(document.activeElement).toBe(catalog.get('[role="tab"][aria-selected="true"]').element)
+
+    await catalog.get('[role="tab"][aria-selected="true"]').trigger('keydown', { key: 'End' })
+    expect(catalog.get('[role="tab"][aria-selected="true"]').text()).toBe('Secondary')
+    expect(document.activeElement).toBe(catalog.get('[role="tab"][aria-selected="true"]').element)
+
+    await catalog.get('[role="tab"][aria-selected="true"]').trigger('keydown', { key: 'Home' })
+    expect(catalog.get('[role="tab"][aria-selected="true"]').text()).toBe('General access')
     expect(document.activeElement).toBe(catalog.get('[role="tab"][aria-selected="true"]').element)
   })
 

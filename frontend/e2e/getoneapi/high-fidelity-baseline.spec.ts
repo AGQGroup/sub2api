@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 const publicSettings = {
   registration_enabled: true,
@@ -189,6 +189,48 @@ function contrastRatio(foreground: string, background: string): number {
   return (lighter + 0.05) / (darker + 0.05)
 }
 
+async function getEffectiveColors(locator: Locator): Promise<{ foreground: string; background: string }> {
+  return locator.evaluate((element) => {
+    const parseColor = (value: string): [number, number, number, number] => {
+      if (value === 'transparent') return [0, 0, 0, 0]
+      const channels = (value.match(/[\d.]+/g) || []).map(Number)
+      return [channels[0] || 0, channels[1] || 0, channels[2] || 0, channels[3] ?? 1]
+    }
+    const composite = (
+      foreground: [number, number, number, number],
+      background: [number, number, number, number]
+    ): [number, number, number, number] => {
+      const alpha = foreground[3] + background[3] * (1 - foreground[3])
+      if (alpha === 0) return [0, 0, 0, 0]
+      return [
+        (foreground[0] * foreground[3] + background[0] * background[3] * (1 - foreground[3])) / alpha,
+        (foreground[1] * foreground[3] + background[1] * background[3] * (1 - foreground[3])) / alpha,
+        (foreground[2] * foreground[3] + background[2] * background[3] * (1 - foreground[3])) / alpha,
+        alpha,
+      ]
+    }
+
+    let background: [number, number, number, number] = [0, 0, 0, 0]
+    let current: Element | null = element
+    while (current) {
+      background = composite(background, parseColor(getComputedStyle(current).backgroundColor))
+      if (background[3] >= 0.999) break
+      current = current.parentElement
+    }
+
+    return {
+      foreground: getComputedStyle(element).color,
+      background: `rgb(${background.slice(0, 3).map((channel) => Math.round(channel)).join(', ')})`,
+    }
+  })
+}
+
+async function requireBox(locator: Locator): Promise<NonNullable<Awaited<ReturnType<Locator['boundingBox']>>>> {
+  const box = await locator.boundingBox()
+  expect(box).not.toBeNull()
+  return box!
+}
+
 for (const viewport of viewports) {
   for (const mode of ['light', 'dark'] as const) {
     test(`${viewport.name} ${mode} login baseline`, async ({ page }) => {
@@ -211,12 +253,6 @@ for (const viewport of viewports) {
       expect(dimensions.scrollWidth).toBe(dimensions.clientWidth)
       expect(dimensions.bodyFontSize).toBeGreaterThanOrEqual(16)
 
-      const serviceLinkColors = await page.locator('.g1-auth-facts a').first().evaluate((link) => ({
-        foreground: getComputedStyle(link).color,
-        background: getComputedStyle(document.querySelector('[data-surface="getoneapi-auth"]')!).backgroundColor,
-      }))
-      expect(contrastRatio(serviceLinkColors.foreground, serviceLinkColors.background)).toBeGreaterThanOrEqual(4.5)
-
       const inputPaddings = await page.locator('#email, #password').evaluateAll((inputs) =>
         inputs.map((input) => ({
           left: Number.parseFloat(getComputedStyle(input).paddingLeft),
@@ -226,16 +262,81 @@ for (const viewport of viewports) {
       expect(inputPaddings.every((padding) => padding.left >= 44)).toBe(true)
       expect(inputPaddings[1].right).toBeGreaterThanOrEqual(44)
 
-      for (const selector of [
-        '[data-ui="auth-primary"]',
-        '[data-ui="auth-password-toggle"]',
-        '[data-ui="language-trigger"]',
-        '[data-theme-mode="light"]',
-      ]) {
-        const box = await page.locator(selector).boundingBox()
-        expect(box?.width).toBeGreaterThanOrEqual(44)
-        expect(box?.height).toBeGreaterThanOrEqual(44)
+      const undersizedTargets = await page.locator([
+        'a[href]',
+        'button',
+        'input:not([type="hidden"])',
+        'select',
+        'textarea',
+        '[role="button"]',
+        '[role="tab"]',
+        '[role="radio"]',
+        '[role="menuitemradio"]',
+        '[tabindex]:not([tabindex="-1"])',
+        '[contenteditable="true"]',
+        'summary',
+      ].join(',')).evaluateAll((elements) => elements.flatMap((element) => {
+        const rect = element.getBoundingClientRect()
+        const style = getComputedStyle(element)
+        if (rect.width === 0 || rect.height === 0 || style.visibility === 'hidden') return []
+        if (rect.width >= 44 && rect.height >= 44) return []
+        return [{
+          target: element.getAttribute('data-ui')
+            || element.getAttribute('aria-label')
+            || element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 60)
+            || element.tagName.toLowerCase(),
+          width: rect.width,
+          height: rect.height,
+        }]
+      }))
+      expect.soft(undersizedTargets, 'visible interactive targets smaller than 44x44').toEqual([])
+
+      const textLinks = page.locator('a[href]:visible')
+      for (let index = 0; index < await textLinks.count(); index += 1) {
+        const link = textLinks.nth(index)
+        const label = (await link.innerText()).trim().replace(/\s+/g, ' ')
+        if (!label) continue
+        const idleColors = await getEffectiveColors(link)
+        expect.soft(
+          contrastRatio(idleColors.foreground, idleColors.background),
+          `${label} idle contrast`
+        ).toBeGreaterThanOrEqual(4.5)
+        await link.hover()
+        await link.evaluate((element) => element.getAnimations().forEach((animation) => animation.finish()))
+        const hoverColors = await getEffectiveColors(link)
+        expect.soft(
+          contrastRatio(hoverColors.foreground, hoverColors.background),
+          `${label} hover contrast`
+        ).toBeGreaterThanOrEqual(4.5)
       }
+      await page.mouse.move(1, 1)
+
+      const visualViolations = await page.locator('body *').evaluateAll((elements) => elements.flatMap((element) => {
+        const rect = element.getBoundingClientRect()
+        const style = getComputedStyle(element)
+        if (rect.width === 0 || rect.height === 0 || style.visibility === 'hidden') return []
+        const radiusToPixels = (value: string) => value.endsWith('%')
+          ? Math.min(rect.width, rect.height) * Number.parseFloat(value) / 100
+          : Number.parseFloat(value)
+        const maxRadius = Math.max(...[
+          style.borderTopLeftRadius,
+          style.borderTopRightRadius,
+          style.borderBottomRightRadius,
+          style.borderBottomLeftRadius,
+        ].map(radiusToPixels))
+        const reasons = [
+          ...(maxRadius > 8.01 ? [`radius ${maxRadius}px`] : []),
+          ...(style.backgroundImage.includes('gradient') ? [style.backgroundImage] : []),
+        ]
+        if (!reasons.length) return []
+        return [{
+          element: `${element.tagName.toLowerCase()}.${element.className || ''}`.slice(0, 100),
+          reasons,
+        }]
+      }))
+      expect.soft(visualViolations, 'visible radius or gradient violations').toEqual([])
+      await expect.soft(page.locator('.card .card:visible')).toHaveCount(0)
+      await expect.soft(page.locator('[data-ui="decorative-orb"]')).toHaveCount(0)
 
       if (mode === 'dark') {
         const colors = await page.locator('[data-ui="auth-primary"]').evaluate((button) => ({
@@ -257,10 +358,20 @@ for (const viewport of viewports) {
       expect(contrastRatio(hoverColors.foreground, hoverColors.background)).toBeGreaterThanOrEqual(4.5)
       await page.mouse.move(1, 1)
 
-      if (viewport.width < 768) {
-        const formBox = await page.locator('form').boundingBox()
-        const catalogBox = await page.locator('.g1-auth-catalog').boundingBox()
-        expect(formBox?.y).toBeLessThan(catalogBox?.y || 0)
+      const headerBox = await requireBox(page.locator('header'))
+      const mainBox = await requireBox(page.locator('main'))
+      const factsBox = await requireBox(page.locator('.g1-auth-facts'))
+      const authBox = await requireBox(page.locator('.g1-auth-panel'))
+      const catalogBox = await requireBox(page.locator('.g1-auth-catalog'))
+      expect.soft(headerBox.y + headerBox.height, 'header must end before main').toBeLessThanOrEqual(mainBox.y + 0.5)
+
+      if (viewport.width >= 768) {
+        expect.soft(factsBox.x + factsBox.width, 'facts must stay left of authentication').toBeLessThanOrEqual(authBox.x)
+        expect.soft(catalogBox.x + catalogBox.width, 'catalog must stay left of authentication').toBeLessThanOrEqual(authBox.x)
+        expect.soft(factsBox.y + factsBox.height, 'facts must end before catalog').toBeLessThanOrEqual(catalogBox.y)
+      } else {
+        expect.soft(factsBox.y + factsBox.height, 'mobile facts must end before authentication').toBeLessThanOrEqual(authBox.y)
+        expect.soft(authBox.y + authBox.height, 'mobile authentication must end before catalog').toBeLessThanOrEqual(catalogBox.y)
       }
 
       const pixels = await page.screenshot({ fullPage: true, animations: 'disabled' })
