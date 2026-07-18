@@ -29,7 +29,7 @@
   background: var(--g1-primary-hover);
 }
 
-[data-surface^='getoneapi-'] input,
+[data-surface^='getoneapi-'] input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
 [data-surface^='getoneapi-'] select,
 [data-surface^='getoneapi-'] textarea,
 [data-surface^='getoneapi-'] .input {

@@ -10,14 +10,15 @@ export function readThemeMode(): ThemeMode {
 
 export function applyThemeMode(mode: ThemeMode): () => void {
   const media = window.matchMedia('(prefers-color-scheme: dark)')
-  const update = () =>
-    document.documentElement.classList.toggle(
-      'dark',
-      mode === 'dark' || (mode === 'system' && media.matches)
-    )
-  update()
-  if (mode === 'system') media.addEventListener('change', update)
-  return () => media.removeEventListener('change', update)
+  const apply = (dark: boolean) => document.documentElement.classList.toggle('dark', dark)
+  apply(mode === 'dark' || (mode === 'system' && media.matches))
+  // On later media changes, respect the CURRENT stored mode: legacy toggles write
+  // 'dark'/'light' directly to localStorage, and that explicit choice must win.
+  const onChange = (event: MediaQueryListEvent) => {
+    if (readThemeMode() === 'system') apply(event.matches)
+  }
+  if (mode === 'system') media.addEventListener('change', onChange)
+  return () => media.removeEventListener('change', onChange)
 }
 
 export function useThemeMode() {
