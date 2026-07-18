@@ -64,5 +64,11 @@ declare module 'vue-router' {
      * i18n key for the page description
      */
     descriptionKey?: string
+
+    /**
+     * GetOneAPI rollout phase for this route surface.
+     * Rollout/test inventory metadata only — guards must not branch on it.
+     */
+    getoneapiPhase?: 'core-5' | 'beta-50'
   }
 }
