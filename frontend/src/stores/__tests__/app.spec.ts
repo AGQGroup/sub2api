@@ -56,6 +56,8 @@ function createPublicSettings(overrides: Partial<PublicSettings> = {}): PublicSe
     available_channels_enabled: false,
     service_quota_enabled: false,
     affiliate_enabled: false,
+    getoneapi_user_ui_enabled: false,
+    getoneapi_public_catalog_enabled: false,
     ...overrides,
   }
 }
@@ -409,6 +411,27 @@ describe('useAppStore', () => {
       expect(store.siteLogo).toBe('/logo.png')
       expect(store.siteVersion).toBe('1.0.0')
       expect(store.publicSettingsLoaded).toBe(true)
+    })
+
+    it('从注入配置读取 getoneapi 运行时开关', () => {
+      ;(window as any).__APP_CONFIG__ = createPublicSettings({
+        getoneapi_user_ui_enabled: true,
+        getoneapi_public_catalog_enabled: true,
+      })
+
+      const store = useAppStore()
+      expect(store.initFromInjectedConfig()).toBe(true)
+      expect(store.getoneapiUserUIEnabled).toBe(true)
+      expect(store.getoneapiPublicCatalogEnabled).toBe(true)
+    })
+
+    it('getoneapi 运行时开关缺省时回退为 false', () => {
+      ;(window as any).__APP_CONFIG__ = { site_name: 'TestSite' }
+
+      const store = useAppStore()
+      expect(store.initFromInjectedConfig()).toBe(true)
+      expect(store.getoneapiUserUIEnabled).toBe(false)
+      expect(store.getoneapiPublicCatalogEnabled).toBe(false)
     })
 
     it('无注入配置时返回 false', () => {

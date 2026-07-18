@@ -370,6 +370,10 @@ type PublicSettings struct {
 	RiskControlEnabled bool `json:"risk_control_enabled"`
 
 	AllowUserViewErrorRequests bool `json:"allow_user_view_error_requests"`
+
+	// GetOneAPI runtime flags (from config file, not DB settings)
+	GetOneAPIUserUIEnabled        bool `json:"getoneapi_user_ui_enabled"`
+	GetOneAPIPublicCatalogEnabled bool `json:"getoneapi_public_catalog_enabled"`
 }
 
 type LoginAgreementDocument struct {

@@ -146,6 +146,29 @@ func TestSettingService_GetPublicSettings_DoesNotExposeMobileOnlyWeChatAsWebOAut
 	require.True(t, settings.WeChatOAuthMobileEnabled)
 }
 
+func TestSettingService_GetPublicSettings_ExposesGetOneAPIRuntimeFlags(t *testing.T) {
+	svc := NewSettingService(&settingPublicRepoStub{values: map[string]string{}}, &config.Config{
+		GetOneAPI: config.GetOneAPIConfig{
+			UserUIEnabled:        true,
+			PublicCatalogEnabled: true,
+		},
+	})
+
+	got, err := svc.GetPublicSettings(context.Background())
+	require.NoError(t, err)
+	require.True(t, got.GetOneAPIUserUIEnabled)
+	require.True(t, got.GetOneAPIPublicCatalogEnabled)
+}
+
+func TestSettingService_GetPublicSettings_GetOneAPIRuntimeFlagsDefaultFalse(t *testing.T) {
+	svc := NewSettingService(&settingPublicRepoStub{values: map[string]string{}}, &config.Config{})
+
+	got, err := svc.GetPublicSettings(context.Background())
+	require.NoError(t, err)
+	require.False(t, got.GetOneAPIUserUIEnabled)
+	require.False(t, got.GetOneAPIPublicCatalogEnabled)
+}
+
 func TestSettingService_GetPublicSettings_FallsBackToConfigForWeChatOAuthCapabilities(t *testing.T) {
 	svc := NewSettingService(&settingPublicRepoStub{values: map[string]string{}}, &config.Config{
 		WeChat: config.WeChatConnectConfig{

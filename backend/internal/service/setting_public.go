@@ -337,6 +337,9 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		RiskControlEnabled: settings[SettingKeyRiskControlEnabled] == "true",
 
 		AllowUserViewErrorRequests: settings[SettingKeyAllowUserViewErrorRequests] == "true",
+
+		GetOneAPIUserUIEnabled:        s.cfg != nil && s.cfg.GetOneAPI.UserUIEnabled,
+		GetOneAPIPublicCatalogEnabled: s.cfg != nil && s.cfg.GetOneAPI.PublicCatalogEnabled,
 	}, nil
 }
 
@@ -497,6 +500,10 @@ type PublicSettingsInjectionPayload struct {
 	AffiliateEnabled                     bool `json:"affiliate_enabled"`
 	RiskControlEnabled                   bool `json:"risk_control_enabled"`
 	AllowUserViewErrorRequests           bool `json:"allow_user_view_error_requests"`
+
+	// GetOneAPI runtime flags (from config file, not DB settings)
+	GetOneAPIUserUIEnabled        bool `json:"getoneapi_user_ui_enabled"`
+	GetOneAPIPublicCatalogEnabled bool `json:"getoneapi_public_catalog_enabled"`
 }
 
 // GetPublicSettingsForInjection returns public settings in a format suitable for HTML injection.
@@ -562,6 +569,9 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		AffiliateEnabled:                     settings.AffiliateEnabled,
 		RiskControlEnabled:                   settings.RiskControlEnabled,
 		AllowUserViewErrorRequests:           settings.AllowUserViewErrorRequests,
+
+		GetOneAPIUserUIEnabled:        settings.GetOneAPIUserUIEnabled,
+		GetOneAPIPublicCatalogEnabled: settings.GetOneAPIPublicCatalogEnabled,
 	}, nil
 }
 

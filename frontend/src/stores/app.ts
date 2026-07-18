@@ -51,6 +51,12 @@ export const useAppStore = defineStore('app', () => {
 
   const hasActiveToasts = computed(() => toasts.value.length > 0)
   const backendModeEnabled = computed(() => cachedPublicSettings.value?.backend_mode_enabled ?? false)
+  const getoneapiUserUIEnabled = computed(
+    () => cachedPublicSettings.value?.getoneapi_user_ui_enabled === true
+  )
+  const getoneapiPublicCatalogEnabled = computed(
+    () => cachedPublicSettings.value?.getoneapi_public_catalog_enabled === true
+  )
 
   const loadingCount = ref<number>(0)
 
@@ -369,6 +375,8 @@ export const useAppStore = defineStore('app', () => {
         service_quota_enabled: false,
         affiliate_enabled: false,
         allow_user_view_error_requests: false,
+        getoneapi_user_ui_enabled: false,
+        getoneapi_public_catalog_enabled: false,
       })
     }
 
@@ -455,6 +463,8 @@ export const useAppStore = defineStore('app', () => {
     // Computed
     hasActiveToasts,
     backendModeEnabled,
+    getoneapiUserUIEnabled,
+    getoneapiPublicCatalogEnabled,
 
     // Actions
     toggleSidebar,

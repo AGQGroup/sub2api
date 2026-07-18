@@ -241,6 +241,9 @@ export interface PublicSettings {
   service_quota_enabled: boolean
   affiliate_enabled: boolean
   allow_user_view_error_requests?: boolean
+  // GetOneAPI 运行时开关（来自后端配置文件）；可选：注入的 __APP_CONFIG__ 旧缓存可能缺失
+  getoneapi_user_ui_enabled?: boolean
+  getoneapi_public_catalog_enabled?: boolean
 }
 
 export interface AuthResponse {

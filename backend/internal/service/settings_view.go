@@ -339,6 +339,10 @@ type PublicSettings struct {
 
 	// 允许终端用户在用量页查看自己的失败请求
 	AllowUserViewErrorRequests bool `json:"allow_user_view_error_requests"`
+
+	// GetOneAPI 运行时开关（来自配置文件，非数据库设置）
+	GetOneAPIUserUIEnabled        bool `json:"getoneapi_user_ui_enabled"`
+	GetOneAPIPublicCatalogEnabled bool `json:"getoneapi_public_catalog_enabled"`
 }
 
 type LoginAgreementDocument struct {

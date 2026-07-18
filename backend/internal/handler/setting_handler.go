@@ -103,6 +103,9 @@ func (h *SettingHandler) GetPublicSettings(c *gin.Context) {
 		RiskControlEnabled: settings.RiskControlEnabled,
 
 		AllowUserViewErrorRequests: settings.AllowUserViewErrorRequests,
+
+		GetOneAPIUserUIEnabled:        settings.GetOneAPIUserUIEnabled,
+		GetOneAPIPublicCatalogEnabled: settings.GetOneAPIPublicCatalogEnabled,
 	})
 }
 
