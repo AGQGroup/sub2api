@@ -18,11 +18,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// PublicCatalogInvalidator is the display-cache-only invalidation hook for
+// the GetOneAPI public catalog. *catalog.Service satisfies it. It is set via
+// setter injection so focused handler tests can leave it nil.
+type PublicCatalogInvalidator interface {
+	Invalidate()
+}
+
 // GroupHandler handles admin group management
 type GroupHandler struct {
-	adminService         service.AdminService
-	dashboardService     *service.DashboardService
-	groupCapacityService *service.GroupCapacityService
+	adminService             service.AdminService
+	dashboardService         *service.DashboardService
+	groupCapacityService     *service.GroupCapacityService
+	publicCatalogInvalidator PublicCatalogInvalidator
+}
+
+// SetPublicCatalogInvalidator wires the public catalog display cache so
+// successful group mutations drop the last published snapshot.
+func (h *GroupHandler) SetPublicCatalogInvalidator(value PublicCatalogInvalidator) {
+	h.publicCatalogInvalidator = value
+}
+
+// invalidatePublicCatalog clears the public catalog cache after a successful
+// mutation. Failed mutations must never reach this path.
+func (h *GroupHandler) invalidatePublicCatalog() {
+	if h.publicCatalogInvalidator != nil {
+		h.publicCatalogInvalidator.Invalidate()
+	}
 }
 
 type optionalLimitField struct {
@@ -361,6 +383,7 @@ func (h *GroupHandler) Create(c *gin.Context) {
 		return
 	}
 
+	h.invalidatePublicCatalog()
 	response.Success(c, dto.GroupFromServiceAdmin(group))
 }
 
@@ -477,6 +500,7 @@ func (h *GroupHandler) Update(c *gin.Context) {
 		return
 	}
 
+	h.invalidatePublicCatalog()
 	response.Success(c, dto.GroupFromServiceAdmin(group))
 }
 
@@ -495,6 +519,7 @@ func (h *GroupHandler) Delete(c *gin.Context) {
 		return
 	}
 
+	h.invalidatePublicCatalog()
 	response.Success(c, gin.H{"message": "Group deleted successfully"})
 }
 
@@ -709,5 +734,6 @@ func (h *GroupHandler) UpdateSortOrder(c *gin.Context) {
 		return
 	}
 
+	h.invalidatePublicCatalog()
 	response.Success(c, gin.H{"message": "Sort order updated successfully"})
 }

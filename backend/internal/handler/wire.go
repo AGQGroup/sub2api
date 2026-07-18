@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/Wei-Shaw/sub2api/internal/getoneapi/catalog"
 	"github.com/Wei-Shaw/sub2api/internal/handler/admin"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 
@@ -43,8 +44,11 @@ func ProvideAdminHandlers(
 	complianceHandler *admin.ComplianceHandler,
 	auditLogHandler *admin.AuditLogHandler,
 	upstreamBillingProbe *service.UpstreamBillingProbeService,
+	publicCatalog *catalog.Service,
 ) *AdminHandlers {
 	accountHandler.SetUpstreamBillingProbeService(upstreamBillingProbe)
+	groupHandler.SetPublicCatalogInvalidator(publicCatalog)
+	channelHandler.SetPublicCatalogInvalidator(publicCatalog)
 	return &AdminHandlers{
 		Dashboard:              dashboardHandler,
 		User:                   userHandler,
@@ -101,6 +105,12 @@ func ProvideAdminSettingHandler(settingService *service.SettingService, emailSer
 	return h
 }
 
+// ProvidePublicCatalogHandler adapts the concrete catalog service to the
+// handler's PublicCatalogService interface.
+func ProvidePublicCatalogHandler(catalogSvc *catalog.Service) *PublicCatalogHandler {
+	return NewPublicCatalogHandler(catalogSvc)
+}
+
 // ProvideHandlers creates the Handlers struct
 func ProvideHandlers(
 	authHandler *AuthHandler,
@@ -121,6 +131,7 @@ func ProvideHandlers(
 	availableChannelHandler *AvailableChannelHandler,
 	asyncImageHandler *AsyncImageHandler,
 	batchImageHandler *BatchImageHandler,
+	publicCatalogHandler *PublicCatalogHandler,
 	_ *service.IdempotencyCoordinator,
 	_ *service.IdempotencyCleanupService,
 ) *Handlers {
@@ -143,6 +154,7 @@ func ProvideHandlers(
 		AvailableChannel: availableChannelHandler,
 		AsyncImage:       asyncImageHandler,
 		BatchImage:       batchImageHandler,
+		PublicCatalog:    publicCatalogHandler,
 	}
 }
 
@@ -166,6 +178,7 @@ var ProviderSet = wire.NewSet(
 	NewAvailableChannelHandler,
 	NewAsyncImageHandler,
 	NewBatchImageHandler,
+	ProvidePublicCatalogHandler,
 
 	// Admin handlers
 	admin.NewDashboardHandler,

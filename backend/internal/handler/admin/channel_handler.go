@@ -15,14 +15,29 @@ import (
 
 // ChannelHandler handles admin channel management
 type ChannelHandler struct {
-	channelService *service.ChannelService
-	billingService *service.BillingService
-	pricingService *service.PricingService
+	channelService           *service.ChannelService
+	billingService           *service.BillingService
+	pricingService           *service.PricingService
+	publicCatalogInvalidator PublicCatalogInvalidator
 }
 
 // NewChannelHandler creates a new admin channel handler
 func NewChannelHandler(channelService *service.ChannelService, billingService *service.BillingService, pricingService *service.PricingService) *ChannelHandler {
 	return &ChannelHandler{channelService: channelService, billingService: billingService, pricingService: pricingService}
+}
+
+// SetPublicCatalogInvalidator wires the public catalog display cache so
+// successful channel mutations drop the last published snapshot.
+func (h *ChannelHandler) SetPublicCatalogInvalidator(value PublicCatalogInvalidator) {
+	h.publicCatalogInvalidator = value
+}
+
+// invalidatePublicCatalog clears the public catalog cache after a successful
+// mutation. Failed mutations must never reach this path.
+func (h *ChannelHandler) invalidatePublicCatalog() {
+	if h.publicCatalogInvalidator != nil {
+		h.publicCatalogInvalidator.Invalidate()
+	}
 }
 
 // --- Request / Response types ---
@@ -394,6 +409,7 @@ func (h *ChannelHandler) Create(c *gin.Context) {
 		return
 	}
 
+	h.invalidatePublicCatalog()
 	response.Success(c, channelToResponse(channel))
 }
 
@@ -459,6 +475,7 @@ func (h *ChannelHandler) Update(c *gin.Context) {
 		return
 	}
 
+	h.invalidatePublicCatalog()
 	response.Success(c, channelToResponse(channel))
 }
 
@@ -476,6 +493,7 @@ func (h *ChannelHandler) Delete(c *gin.Context) {
 		return
 	}
 
+	h.invalidatePublicCatalog()
 	response.Success(c, gin.H{"message": "Channel deleted successfully"})
 }
 
