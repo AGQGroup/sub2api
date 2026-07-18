@@ -391,7 +391,8 @@ describe('GetOneAPI high-fidelity component baseline', () => {
     const updatedAt = catalog.get('[data-ui="catalog-updated-at"]')
     expect(updatedAt.element.tagName).toBe('TIME')
     expect(updatedAt.attributes('datetime')).toBe('2026-07-18T08:30:00Z')
-    expect(updatedAt.text()).toBe('Jul 18, 2026, 4:30 PM')
+    expect(updatedAt.text()).toContain('Jul 18, 2026')
+    expect(updatedAt.text()).toContain('4:30 PM')
     expect(catalog.text()).not.toContain('channel')
     expect(catalog.text()).not.toContain('account count')
 
@@ -501,7 +502,10 @@ describe('GetOneAPI high-fidelity component baseline', () => {
       global: { plugins: [i18n] },
     })
 
-    expect(catalogMeta.get('time').text()).toBe('Jul 18, 2026, 4:30 PM')
+    const updatedAt = catalogMeta.get('time')
+    expect(updatedAt.attributes('datetime')).toBe('2026-07-18T08:30:00Z')
+    expect(updatedAt.get('.g1-catalog-meta__updated-date').text()).toBe('Jul 18, 2026')
+    expect(updatedAt.get('.g1-catalog-meta__updated-time').text()).toBe('4:30 PM')
 
     const invalidMeta = mount(CatalogMeta, {
       props: { catalog: { ...catalogFixture, updated_at: 'not-a-date' } },

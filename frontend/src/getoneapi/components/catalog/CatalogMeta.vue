@@ -19,8 +19,11 @@
           v-if="updatedAt.valid"
           data-ui="catalog-updated-at"
           :datetime="catalog.updated_at"
-        >{{ updatedAt.text }}</time>
-        <span v-else data-ui="catalog-updated-at">{{ updatedAt.text }}</span>
+        >
+          <span class="g1-catalog-meta__updated-date">{{ updatedAt.dateText }}</span>
+          <span class="g1-catalog-meta__updated-time">{{ updatedAt.timeText }}</span>
+        </time>
+        <span v-else data-ui="catalog-updated-at">{{ updatedAt.fallbackText }}</span>
       </dd>
     </div>
     <div>
@@ -41,21 +44,35 @@ const updatedAt = computed(() => {
   const source = props.catalog.updated_at
   const date = new Date(source)
   if (!source || Number.isNaN(date.getTime())) {
-    return { valid: false, text: source || 'Unavailable' }
+    return {
+      valid: false,
+      dateText: '',
+      timeText: '',
+      fallbackText: source || 'Unavailable',
+    }
   }
 
   const dateLocale = i18n.global.locale.value.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US'
   try {
     return {
       valid: true,
-      text: new Intl.DateTimeFormat(dateLocale, {
+      dateText: new Intl.DateTimeFormat(dateLocale, {
         dateStyle: 'medium',
+        timeZone: props.catalog.timezone,
+      }).format(date),
+      timeText: new Intl.DateTimeFormat(dateLocale, {
         timeStyle: 'short',
         timeZone: props.catalog.timezone,
       }).format(date),
+      fallbackText: '',
     }
   } catch {
-    return { valid: false, text: source }
+    return {
+      valid: false,
+      dateText: '',
+      timeText: '',
+      fallbackText: source,
+    }
   }
 })
 </script>
@@ -87,6 +104,17 @@ const updatedAt = computed(() => {
   color: var(--g1-text);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
+}
+
+.g1-catalog-meta time {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+
+.g1-catalog-meta__updated-date,
+.g1-catalog-meta__updated-time {
+  white-space: nowrap;
 }
 
 @media (max-width: 1023px) {
