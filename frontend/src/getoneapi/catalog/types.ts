@@ -1,3 +1,4 @@
+// Contract source of truth: backend/internal/getoneapi/catalog/catalog.go — keep these types in sync with the Go snapshot DTOs.
 export interface PublicCatalogPricingInterval {
   min_tokens: number
   max_tokens: number | null

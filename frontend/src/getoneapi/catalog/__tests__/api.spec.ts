@@ -15,7 +15,7 @@ vi.mock('@/api/client', () => ({
 import { getPublicCatalog } from '../api'
 
 const fixtureCatalog: PublicCatalog = {
-  version: '2026-07-18',
+  version: '1',
   updated_at: '2026-07-18T00:00:00Z',
   currency: 'USD',
   token_price_unit: 'per_1m_tokens',
@@ -31,7 +31,7 @@ const fixtureCatalog: PublicCatalog = {
       peak_start: '',
       peak_end: '',
       peak_rate_multiplier: 1,
-      supported_clients: ['claude-code'],
+      supported_clients: ['claude_code'],
       models: [
         {
           name: 'claude-sonnet-4-5',
