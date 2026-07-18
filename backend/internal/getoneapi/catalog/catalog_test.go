@@ -239,6 +239,105 @@ func TestBuildResolverConsistencyAcrossBillingModes(t *testing.T) {
 	require.InDelta(t, 0.04*rate, *image.Intervals[0].PerRequest, 1e-12)
 }
 
+func TestBuildOmitsUnpriceableResolvedModels(t *testing.T) {
+	// The real ModelPricingResolver never returns nil: on LiteLLM miss with no
+	// channel override it returns a token-mode ResolvedPricing with nil
+	// BasePricing. Such results carry no usable pricing and must be omitted.
+	input := []service.AvailableChannel{{
+		Status: service.StatusActive,
+		Groups: []service.AvailableGroupRef{
+			{ID: 7, Name: "Standard", Platform: "anthropic", RateMultiplier: 1},
+		},
+		SupportedModels: []service.SupportedModel{
+			{Name: "fallback-miss", Platform: "anthropic"},
+			{Name: "empty-per-request", Platform: "anthropic"},
+			{Name: "empty-image", Platform: "anthropic"},
+			{Name: "priced", Platform: "anthropic"},
+		},
+	}}
+	resolver := &stubResolver{byGroupModel: map[string]*service.ResolvedPricing{
+		"7:fallback-miss": {
+			Mode:   service.BillingModeToken,
+			Source: service.PricingSourceFallback,
+			// BasePricing nil, no intervals: nothing publishable.
+		},
+		"7:empty-per-request": {
+			Mode:   service.BillingModePerRequest,
+			Source: service.PricingSourceChannel,
+			// No RequestTiers, DefaultPerRequestPrice zero.
+		},
+		"7:empty-image": {
+			Mode:   service.BillingModeImage,
+			Source: service.PricingSourceChannel,
+			// No RequestTiers, DefaultPerRequestPrice zero.
+		},
+		"7:priced": {
+			Mode:        service.BillingModeToken,
+			BasePricing: &service.ModelPricing{InputPricePerToken: 3e-6, OutputPricePerToken: 15e-6},
+		},
+	}}
+	got := buildSnapshot(context.Background(), input, resolver, map[int64]struct{}{7: {}}, "UTC", testNow)
+	require.Len(t, got.Groups, 1)
+	require.Len(t, got.Groups[0].Models, 1)
+	require.Equal(t, "priced", got.Groups[0].Models[0].Name)
+}
+
+func TestBuildOmitsGroupWhenAllModelsUnpriceable(t *testing.T) {
+	input := []service.AvailableChannel{{
+		Status: service.StatusActive,
+		Groups: []service.AvailableGroupRef{
+			{ID: 7, Name: "Standard", Platform: "anthropic", RateMultiplier: 1},
+		},
+		SupportedModels: []service.SupportedModel{{Name: "fallback-miss", Platform: "anthropic"}},
+	}}
+	resolver := &stubResolver{byGroupModel: map[string]*service.ResolvedPricing{
+		"7:fallback-miss": {Mode: service.BillingModeToken, Source: service.PricingSourceFallback},
+	}}
+	got := buildSnapshot(context.Background(), input, resolver, map[int64]struct{}{7: {}}, "UTC", testNow)
+	require.Empty(t, got.Groups)
+}
+
+func TestFlatTokenPricingSerializesEmptyIntervals(t *testing.T) {
+	pricing := toPublicPricing(&service.ResolvedPricing{
+		Mode:        service.BillingModeToken,
+		BasePricing: &service.ModelPricing{InputPricePerToken: 3e-6, OutputPricePerToken: 15e-6},
+	}, 1)
+	raw, err := json.Marshal(pricing)
+	require.NoError(t, err)
+	require.Contains(t, string(raw), `"intervals":[]`)
+	require.NotContains(t, string(raw), `"intervals":null`)
+}
+
+func TestBuildSortsGroupsDeterministically(t *testing.T) {
+	// Two allowlisted groups share a name; map iteration order is random, so
+	// the snapshot must order them by a stable tiebreaker (Key).
+	input := []service.AvailableChannel{{
+		Status: service.StatusActive,
+		Groups: []service.AvailableGroupRef{
+			{ID: 7, Name: "Standard", Platform: "anthropic", RateMultiplier: 1},
+			{ID: 8, Name: "Standard", Platform: "openai", RateMultiplier: 1},
+		},
+		SupportedModels: []service.SupportedModel{
+			{Name: "claude-sonnet", Platform: "anthropic"},
+			{Name: "gpt-5.1", Platform: "openai"},
+		},
+	}}
+	resolver := &stubResolver{byGroupModel: map[string]*service.ResolvedPricing{
+		"7:claude-sonnet": {Mode: service.BillingModeToken, BasePricing: &service.ModelPricing{InputPricePerToken: 3e-6}},
+		"8:gpt-5.1":       {Mode: service.BillingModeToken, BasePricing: &service.ModelPricing{InputPricePerToken: 2e-6}},
+	}}
+	wantFirst, wantSecond := groupKey("anthropic", "Standard"), groupKey("openai", "Standard")
+	if wantFirst > wantSecond {
+		wantFirst, wantSecond = wantSecond, wantFirst
+	}
+	for range 100 {
+		got := buildSnapshot(context.Background(), input, resolver, map[int64]struct{}{7: {}, 8: {}}, "UTC", testNow)
+		require.Len(t, got.Groups, 2)
+		require.Equal(t, wantFirst, got.Groups[0].Key)
+		require.Equal(t, wantSecond, got.Groups[1].Key)
+	}
+}
+
 func TestSnapshotJSONWhitelist(t *testing.T) {
 	input := []service.AvailableChannel{{
 		Status:             service.StatusActive,

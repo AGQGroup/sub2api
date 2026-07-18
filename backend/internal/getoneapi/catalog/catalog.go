@@ -194,9 +194,11 @@ func (s *Service) allowlist() map[int64]struct{} {
 // buildSnapshot transforms the available-channel view into the public
 // contract. It includes only active channels, allowlisted non-exclusive
 // groups, and same-platform models; candidates are deduplicated by group ID
-// and model name. Models the resolver cannot price are omitted. The
-// candidate channel's raw Pricing pointer is never read — every published
-// number comes from the resolver.
+// and model name. Models the resolver cannot price are omitted — note the
+// real resolver never returns nil, so "cannot price" means a resolved result
+// with no usable pricing (see isPriceable). The candidate channel's raw
+// Pricing pointer is never read — every published number comes from the
+// resolver.
 func buildSnapshot(ctx context.Context, channels []service.AvailableChannel, resolver pricingResolver, allowlist map[int64]struct{}, timezone string, now time.Time) *Snapshot {
 	type dedupKey struct {
 		groupID int64
@@ -229,7 +231,7 @@ func buildSnapshot(ctx context.Context, channels []service.AvailableChannel, res
 
 				groupID := g.ID
 				resolved := resolver.Resolve(ctx, service.PricingInput{Model: m.Name, GroupID: &groupID})
-				if resolved == nil {
+				if !isPriceable(resolved) {
 					continue
 				}
 				grp, ok := groupByID[g.ID]
@@ -262,7 +264,14 @@ func buildSnapshot(ctx context.Context, channels []service.AvailableChannel, res
 		sort.SliceStable(grp.Models, func(i, j int) bool { return grp.Models[i].Name < grp.Models[j].Name })
 		groups = append(groups, *grp)
 	}
-	sort.SliceStable(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
+	sort.SliceStable(groups, func(i, j int) bool {
+		if groups[i].Name != groups[j].Name {
+			return groups[i].Name < groups[j].Name
+		}
+		// Deterministic tiebreaker: two allowlisted groups may share a name,
+		// and map iteration order must not flap the ETag.
+		return groups[i].Key < groups[j].Key
+	})
 
 	return &Snapshot{
 		Version:        "1",
@@ -271,6 +280,26 @@ func buildSnapshot(ctx context.Context, channels []service.AvailableChannel, res
 		TokenPriceUnit: "per_1m_tokens",
 		Timezone:       timezone,
 		Groups:         groups,
+	}
+}
+
+// isPriceable reports whether a resolved pricing carries anything usable for
+// the public catalog. ModelPricingResolver.Resolve never returns nil — on a
+// LiteLLM miss with no channel override it yields a token-mode result with
+// nil BasePricing — so "unpriceable" must be detected from the payload:
+//   - token: needs BasePricing or at least one interval
+//   - per_request / image: needs request tiers or a non-zero default price
+//     (these modes only arise from a channel override, so BasePricing is
+//     always nil for them and is not a usable signal)
+func isPriceable(resolved *service.ResolvedPricing) bool {
+	if resolved == nil {
+		return false
+	}
+	switch resolved.Mode {
+	case service.BillingModePerRequest, service.BillingModeImage:
+		return len(resolved.RequestTiers) > 0 || resolved.DefaultPerRequestPrice > 0
+	default:
+		return resolved.BasePricing != nil || len(resolved.Intervals) > 0
 	}
 }
 
@@ -297,9 +326,8 @@ func toPublicPricing(resolved *service.ResolvedPricing, rate float64) *Pricing {
 }
 
 func toPublicIntervals(intervals []service.PricingInterval, rate float64) []PricingInterval {
-	if len(intervals) == 0 {
-		return nil
-	}
+	// Always non-nil: the public contract declares intervals as an array,
+	// so empty must serialize as [] rather than null.
 	out := make([]PricingInterval, 0, len(intervals))
 	for _, iv := range intervals {
 		var maxTokens *int
