@@ -1211,3 +1211,16 @@ image_storage:
   presign_expiry_hours: 24
   # 当上游返回的是图片 url 时，下载该图片再转存的字节上限（默认 32MB）
   max_download_bytes: 33554432
+
+# =============================================================================
+# GetOneAPI 扩展功能
+# =============================================================================
+# user_ui_enabled: 用户侧 UI 扩展开关
+# public_catalog_enabled: 公开服务目录开关（无需登录即可查看指定分组的订阅服务）
+# public_catalog_group_ids: 公开目录包含的分组 ID 列表（启用公开目录时必填，且必须为正整数、不可重复）
+# public_catalog_cache_ttl_seconds: 公开目录缓存 TTL（秒），启用公开目录时必须在 30-3600 之间
+getoneapi:
+  user_ui_enabled: false
+  public_catalog_enabled: false
+  public_catalog_group_ids: []
+  public_catalog_cache_ttl_seconds: 300

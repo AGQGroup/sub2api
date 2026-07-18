@@ -2166,3 +2166,29 @@ func TestLoad_DefaultGatewayImageStreamConfig(t *testing.T) {
 		t.Fatalf("image stream timeout = %d, want greater than ordinary stream timeout %d", cfg.Gateway.ImageStreamDataIntervalTimeout, cfg.Gateway.StreamDataIntervalTimeout)
 	}
 }
+
+func TestLoadDefaultGetOneAPIConfig(t *testing.T) {
+	resetViperWithJWTSecret(t)
+
+	cfg, err := Load()
+	require.NoError(t, err)
+	require.False(t, cfg.GetOneAPI.UserUIEnabled)
+	require.False(t, cfg.GetOneAPI.PublicCatalogEnabled)
+	require.Empty(t, cfg.GetOneAPI.PublicCatalogGroupIDs)
+	require.Equal(t, 300, cfg.GetOneAPI.PublicCatalogCacheTTLSeconds)
+}
+
+func TestValidateGetOneAPIPublicCatalog(t *testing.T) {
+	resetViperWithJWTSecret(t)
+
+	cfg, err := Load()
+	require.NoError(t, err)
+
+	cfg.GetOneAPI.PublicCatalogEnabled = true
+	cfg.GetOneAPI.PublicCatalogGroupIDs = []int64{7, 7}
+	require.ErrorContains(t, cfg.Validate(), "getoneapi.public_catalog_group_ids contains duplicate id 7")
+
+	cfg.GetOneAPI.PublicCatalogGroupIDs = []int64{7}
+	cfg.GetOneAPI.PublicCatalogCacheTTLSeconds = 10
+	require.ErrorContains(t, cfg.Validate(), "getoneapi.public_catalog_cache_ttl_seconds must be between 30 and 3600")
+}

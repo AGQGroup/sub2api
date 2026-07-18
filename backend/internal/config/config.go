@@ -96,6 +96,7 @@ type Config struct {
 	Idempotency             IdempotencyConfig             `mapstructure:"idempotency"`
 	BatchImage              BatchImageConfig              `mapstructure:"batch_image"`
 	ImageStorage            ImageStorageConfig            `mapstructure:"image_storage"`
+	GetOneAPI               GetOneAPIConfig               `mapstructure:"getoneapi"`
 }
 
 type LogConfig struct {
@@ -253,6 +254,16 @@ func (c *ImageStorageConfig) IsConfigured() bool {
 // Active 返回异步图片任务是否可用：开关打开且凭证齐全
 func (c *ImageStorageConfig) Active() bool {
 	return c.Enabled && c.IsConfigured()
+}
+
+// GetOneAPIConfig GetOneAPI 扩展功能配置。
+// UserUIEnabled 控制用户侧 UI 扩展；PublicCatalogEnabled 开启公开服务目录，
+// 目录仅包含 PublicCatalogGroupIDs 指定的分组，并按 PublicCatalogCacheTTLSeconds 缓存。
+type GetOneAPIConfig struct {
+	UserUIEnabled                bool    `mapstructure:"user_ui_enabled"`
+	PublicCatalogEnabled         bool    `mapstructure:"public_catalog_enabled"`
+	PublicCatalogGroupIDs        []int64 `mapstructure:"public_catalog_group_ids"`
+	PublicCatalogCacheTTLSeconds int     `mapstructure:"public_catalog_cache_ttl_seconds"`
 }
 
 type LinuxDoConnectConfig struct {
@@ -2205,6 +2216,12 @@ func setDefaults() {
 	viper.SetDefault("subscription_maintenance.worker_count", 2)
 	viper.SetDefault("subscription_maintenance.queue_size", 1024)
 
+	// GetOneAPI 扩展功能
+	viper.SetDefault("getoneapi.user_ui_enabled", false)
+	viper.SetDefault("getoneapi.public_catalog_enabled", false)
+	viper.SetDefault("getoneapi.public_catalog_group_ids", []int64{})
+	viper.SetDefault("getoneapi.public_catalog_cache_ttl_seconds", 300)
+
 }
 
 func (c *Config) Validate() error {
@@ -2271,6 +2288,25 @@ func (c *Config) Validate() error {
 	}
 	if c.SubscriptionMaintenance.QueueSize < 0 {
 		return fmt.Errorf("subscription_maintenance.queue_size must be non-negative")
+	}
+
+	if c.GetOneAPI.PublicCatalogEnabled {
+		if len(c.GetOneAPI.PublicCatalogGroupIDs) == 0 {
+			return fmt.Errorf("getoneapi.public_catalog_group_ids must not be empty when public catalog is enabled")
+		}
+		if c.GetOneAPI.PublicCatalogCacheTTLSeconds < 30 || c.GetOneAPI.PublicCatalogCacheTTLSeconds > 3600 {
+			return fmt.Errorf("getoneapi.public_catalog_cache_ttl_seconds must be between 30 and 3600")
+		}
+		seen := make(map[int64]struct{}, len(c.GetOneAPI.PublicCatalogGroupIDs))
+		for _, id := range c.GetOneAPI.PublicCatalogGroupIDs {
+			if id <= 0 {
+				return fmt.Errorf("getoneapi.public_catalog_group_ids must contain positive ids")
+			}
+			if _, ok := seen[id]; ok {
+				return fmt.Errorf("getoneapi.public_catalog_group_ids contains duplicate id %d", id)
+			}
+			seen[id] = struct{}{}
+		}
 	}
 
 	// Gemini OAuth 配置校验：client_id 与 client_secret 必须同时设置或同时留空。
