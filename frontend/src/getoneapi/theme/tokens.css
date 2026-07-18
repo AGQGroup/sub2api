@@ -1,0 +1,43 @@
+/* GetOneAPI scoped semantic design tokens.
+   Only apply under data-surface="getoneapi-*"; admin and legacy pages are unaffected. */
+
+:where([data-surface^='getoneapi-']) {
+  --g1-canvas: #f5f5f7;
+  --g1-surface: #ffffff;
+  --g1-surface-raised: #ffffff;
+  --g1-text: #1d1d1f;
+  --g1-text-secondary: #515154;
+  --g1-text-tertiary: #6e6e73;
+  --g1-divider: #d2d2d7;
+  --g1-control: #e8e8ed;
+  --g1-primary: #0071e3;
+  --g1-primary-hover: #0077ed;
+  --g1-focus: #0071e3;
+  --g1-success: #248a3d;
+  --g1-warning: #b25000;
+  --g1-danger: #d70015;
+  --g1-radius-sm: 4px;
+  --g1-radius-md: 8px;
+  --g1-shadow-raised: 0 2px 10px rgb(0 0 0 / 8%);
+  --g1-content-max: 1440px;
+  color: var(--g1-text);
+  background: var(--g1-canvas);
+  letter-spacing: 0;
+}
+
+.dark :where([data-surface^='getoneapi-']) {
+  --g1-canvas: #000000;
+  --g1-surface: #1c1c1e;
+  --g1-surface-raised: #2c2c2e;
+  --g1-text: #f5f5f7;
+  --g1-text-secondary: #d1d1d6;
+  --g1-text-tertiary: #aeaeb2;
+  --g1-divider: #3a3a3c;
+  --g1-control: #2c2c2e;
+  --g1-primary: #0a84ff;
+  --g1-primary-hover: #409cff;
+  --g1-focus: #64d2ff;
+  --g1-success: #30d158;
+  --g1-warning: #ff9f0a;
+  --g1-danger: #ff453a;
+}

@@ -5,18 +5,14 @@ import router from './router'
 import i18n, { initI18n } from './i18n'
 import { useAppStore } from '@/stores/app'
 import './style.css'
-
-function initThemeClass() {
-  const savedTheme = localStorage.getItem('theme')
-  const shouldUseDark =
-    savedTheme === 'dark' ||
-    (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  document.documentElement.classList.toggle('dark', shouldUseDark)
-}
+import './getoneapi/theme/tokens.css'
+import './getoneapi/theme/surfaces.css'
+import { applyThemeMode, readThemeMode } from './getoneapi/theme/useThemeMode'
 
 async function bootstrap() {
   // Apply theme class globally before app mount to keep all routes consistent.
-  initThemeClass()
+  // Backward compatible with the legacy 'theme' localStorage values ('dark'/'light').
+  applyThemeMode(readThemeMode())
 
   const app = createApp(App)
   const pinia = createPinia()
