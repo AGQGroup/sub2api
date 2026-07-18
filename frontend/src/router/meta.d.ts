@@ -4,6 +4,7 @@
  */
 
 import 'vue-router'
+import type { SurfacePhase } from '@/getoneapi/routes/manifest'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -69,6 +70,6 @@ declare module 'vue-router' {
      * GetOneAPI rollout phase for this route surface.
      * Rollout/test inventory metadata only — guards must not branch on it.
      */
-    getoneapiPhase?: 'core-5' | 'beta-50'
+    getoneapiPhase?: SurfacePhase
   }
 }
