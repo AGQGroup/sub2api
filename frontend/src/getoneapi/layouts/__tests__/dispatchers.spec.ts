@@ -1,5 +1,6 @@
 import { createPinia, setActivePinia, type Pinia } from 'pinia'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
+import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -53,7 +54,10 @@ const GetOneAPIAuthLayoutStub = defineComponent({
       h(
         'div',
         { 'data-testid': 'getoneapi-auth-layout', 'data-surface': 'getoneapi-auth' },
-        [slots.default?.(), slots.footer?.()]
+        [
+          slots.default?.(),
+          slots.footer ? h('footer', { 'data-testid': 'auth-footer-landmark' }, slots.footer()) : null
+        ]
       )
   }
 })
@@ -79,11 +83,34 @@ function setSurfaceState(pinia: Pinia, enabled: boolean, role: 'user' | 'admin' 
   authStore.user = { role } as User
 }
 
-function mountAppLayout(pinia: Pinia): VueWrapper {
+const RouteFixture = defineComponent({
+  name: 'RouteFixture',
+  template: '<div />'
+})
+
+function createFixtureRouter(): Router {
+  return createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      {
+        path: '/user-fixture',
+        component: RouteFixture,
+        meta: { requiresAdmin: false }
+      },
+      {
+        path: '/admin-fixture',
+        component: RouteFixture,
+        meta: { requiresAdmin: true }
+      }
+    ]
+  })
+}
+
+function mountAppLayout(pinia: Pinia, router: Router): VueWrapper {
   return mount(AppLayout, {
     slots: { default: '<span data-testid="app-content">content</span>' },
     global: {
-      plugins: [pinia],
+      plugins: [pinia, router],
       stubs: {
         LegacyAppLayout: LegacyAppLayoutStub,
         GetOneAPIUserLayout: GetOneAPIUserLayoutStub
@@ -92,11 +119,13 @@ function mountAppLayout(pinia: Pinia): VueWrapper {
   })
 }
 
-function mountAuthLayout(pinia: Pinia): VueWrapper {
+function mountAuthLayout(pinia: Pinia, withFooter = true): VueWrapper {
   return mount(AuthLayout, {
-    slots: {
+    slots: withFooter ? {
       default: '<span data-testid="auth-content">content</span>',
       footer: '<span data-testid="auth-footer">footer</span>'
+    } : {
+      default: '<span data-testid="auth-content">content</span>'
     },
     global: {
       plugins: [pinia],
@@ -122,17 +151,21 @@ function mountHomeView(pinia: Pinia): VueWrapper {
 
 describe('GetOneAPI surface dispatchers', () => {
   let pinia: Pinia
+  let router: Router
 
-  beforeEach(() => {
+  beforeEach(async () => {
     pinia = createPinia()
     setActivePinia(pinia)
+    router = createFixtureRouter()
+    await router.push('/user-fixture')
+    await router.isReady()
     replayTour.mockReset()
   })
 
   it('keeps regular users on the legacy app layout when the flag is disabled', () => {
     setSurfaceState(pinia, false, 'user')
 
-    const wrapper = mountAppLayout(pinia)
+    const wrapper = mountAppLayout(pinia, router)
 
     expect(wrapper.find('[data-testid="legacy-app-layout"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="app-content"]').exists()).toBe(true)
@@ -142,7 +175,7 @@ describe('GetOneAPI surface dispatchers', () => {
   it('uses the GetOneAPI user layout for regular users when the flag is enabled', () => {
     setSurfaceState(pinia, true, 'user')
 
-    const wrapper = mountAppLayout(pinia)
+    const wrapper = mountAppLayout(pinia, router)
 
     expect(wrapper.findAll('[data-surface]')).toHaveLength(1)
     expect(wrapper.get('[data-surface]').attributes('data-surface')).toBe('getoneapi-user')
@@ -152,7 +185,7 @@ describe('GetOneAPI surface dispatchers', () => {
   it('always keeps administrators on the legacy app layout', () => {
     setSurfaceState(pinia, true, 'admin')
 
-    const wrapper = mountAppLayout(pinia)
+    const wrapper = mountAppLayout(pinia, router)
 
     expect(wrapper.find('[data-testid="legacy-app-layout"]').exists()).toBe(true)
     expect(wrapper.findAll('[data-surface]')).toHaveLength(0)
@@ -160,12 +193,33 @@ describe('GetOneAPI surface dispatchers', () => {
 
   it('forwards replayTour from the selected app layout', () => {
     setSurfaceState(pinia, false, 'user')
-    const wrapper = mountAppLayout(pinia)
+    const wrapper = mountAppLayout(pinia, router)
 
     ;(wrapper.vm as unknown as { replayTour: () => void }).replayTour()
 
     expect(replayTour).toHaveBeenCalledOnce()
   })
+
+  it.each([
+    ['a regular user', { role: 'user' } as User],
+    ['no authenticated user', null]
+  ])(
+    'keeps an admin route on the legacy layout after the role changes to %s',
+    async (_, nextUser) => {
+      setSurfaceState(pinia, true, 'admin')
+      await router.push('/admin-fixture')
+      const wrapper = mountAppLayout(pinia, router)
+      const authStore = useAuthStore(pinia)
+
+      expect(wrapper.find('[data-testid="legacy-app-layout"]').exists()).toBe(true)
+
+      authStore.user = nextUser
+      await nextTick()
+
+      expect(wrapper.find('[data-testid="legacy-app-layout"]').exists()).toBe(true)
+      expect(wrapper.findAll('[data-surface]')).toHaveLength(0)
+    }
+  )
 
   it('keeps the legacy auth layout surface-free when the flag is disabled', () => {
     setSurfaceState(pinia, false)
@@ -186,6 +240,14 @@ describe('GetOneAPI surface dispatchers', () => {
     expect(wrapper.findAll('[data-surface]')).toHaveLength(1)
     expect(wrapper.get('[data-surface]').attributes('data-surface')).toBe('getoneapi-auth')
     expect(wrapper.find('[data-testid="auth-footer"]').exists()).toBe(true)
+  })
+
+  it('does not create a footer when the caller does not provide the footer slot', () => {
+    setSurfaceState(pinia, true)
+
+    const wrapper = mountAuthLayout(pinia, false)
+
+    expect(wrapper.find('footer').exists()).toBe(false)
   })
 
   it('keeps the legacy public home surface-free when the flag is disabled', () => {

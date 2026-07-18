@@ -1,7 +1,7 @@
 <template>
   <component :is="selectedLayout">
     <slot />
-    <template #footer>
+    <template v-if="$slots.footer" #footer>
       <slot name="footer" />
     </template>
   </component>
