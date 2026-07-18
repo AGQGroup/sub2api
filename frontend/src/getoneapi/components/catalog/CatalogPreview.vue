@@ -8,7 +8,7 @@
     <SurfaceState
       v-if="!enabled"
       state="disabled"
-      title="Billing rules and documentation"
+      title="Service documentation"
       message="Public model pricing is not published for this service."
     >
       <a v-for="link in links.documentation" :key="link.href" :href="link.href">{{ link.label }}</a>
@@ -20,20 +20,20 @@
       v-else-if="state === 'empty'"
       state="empty"
       title="No public pricing is published"
-      message="Review the billing rules for the current service terms."
+      message="Review the configured documentation for current service information."
     >
-      <a v-if="billingRulesLink" :href="billingRulesLink.href">{{ billingRulesLink.label }}</a>
+      <a v-if="documentationLink" :href="documentationLink.href">{{ documentationLink.label }}</a>
     </SurfaceState>
 
     <SurfaceState
       v-else-if="state === 'error'"
       state="error"
       title="Pricing is temporarily unavailable"
-      message="Authentication remains available. Retry pricing or review the billing rules."
+      message="Authentication remains available. Retry pricing or review the configured documentation."
       retryable
       @retry="loadCatalog"
     >
-      <a v-if="billingRulesLink" :href="billingRulesLink.href">{{ billingRulesLink.label }}</a>
+      <a v-if="documentationLink" :href="documentationLink.href">{{ documentationLink.label }}</a>
     </SurfaceState>
 
     <div v-else-if="catalog && activeGroup" data-catalog-state="ready">
@@ -83,7 +83,7 @@
             apply the published peak multiplier where enabled. Prices are shown in
             {{ catalog.currency }} using {{ catalog.token_price_unit }}.
           </p>
-          <a v-if="billingRulesLink" :href="billingRulesLink.href">Read billing rules</a>
+          <a v-if="documentationLink" :href="documentationLink.href">{{ documentationLink.label }}</a>
         </div>
       </div>
     </div>
@@ -118,9 +118,7 @@ const links = computed(() => getPublicLinks({
   login_agreement_documents: settings.value?.login_agreement_documents,
   contact_info: settings.value?.contact_info || appStore.contactInfo,
 }))
-const billingRulesLink = computed(() =>
-  links.value.documentation.find((link) => link.label === 'Billing rules') || null
-)
+const documentationLink = computed(() => links.value.documentation[0] || null)
 const activeGroup = computed(() =>
   catalog.value?.groups.find((group) => group.key === activeGroupKey.value)
     || catalog.value?.groups[0]

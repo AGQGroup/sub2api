@@ -142,12 +142,16 @@ const viewports = [
   { name: '1920x1080', width: 1920, height: 1080 },
 ] as const
 
-async function installDeterministicMocks(page: Page, mode: 'light' | 'dark'): Promise<void> {
+async function installDeterministicMocks(
+  page: Page,
+  mode: 'light' | 'dark',
+  settings = publicSettings
+): Promise<void> {
   await page.addInitScript(({ settings, theme }) => {
     window.__APP_CONFIG__ = settings
     localStorage.setItem('theme', theme)
     localStorage.setItem('sub2api_locale', 'en')
-  }, { settings: publicSettings, theme: mode })
+  }, { settings, theme: mode })
 
   await page.route('**/setup/status*', (route) => route.fulfill({
     status: 200,
@@ -157,7 +161,7 @@ async function installDeterministicMocks(page: Page, mode: 'light' | 'dark'): Pr
   await page.route('**/api/v1/settings/public*', (route) => route.fulfill({
     status: 200,
     contentType: 'application/json',
-    body: JSON.stringify({ code: 0, data: publicSettings }),
+    body: JSON.stringify({ code: 0, data: settings }),
   }))
   await page.route('**/api/v1/catalog/public*', (route) => route.fulfill({
     status: 200,
@@ -189,8 +193,11 @@ function contrastRatio(foreground: string, background: string): number {
   return (lighter + 0.05) / (darker + 0.05)
 }
 
-async function getEffectiveColors(locator: Locator): Promise<{ foreground: string; background: string }> {
-  return locator.evaluate((element) => {
+async function getEffectiveColors(
+  locator: Locator,
+  pseudoElement?: string
+): Promise<{ foreground: string; background: string }> {
+  return locator.evaluate((element, pseudo) => {
     const parseColor = (value: string): [number, number, number, number] => {
       if (value === 'transparent') return [0, 0, 0, 0]
       const channels = (value.match(/[\d.]+/g) || []).map(Number)
@@ -219,10 +226,10 @@ async function getEffectiveColors(locator: Locator): Promise<{ foreground: strin
     }
 
     return {
-      foreground: getComputedStyle(element).color,
+      foreground: getComputedStyle(element, pseudo || null).color,
       background: `rgb(${background.slice(0, 3).map((channel) => Math.round(channel)).join(', ')})`,
     }
-  })
+  }, pseudoElement)
 }
 
 async function requireBox(locator: Locator): Promise<NonNullable<Awaited<ReturnType<Locator['boundingBox']>>>> {
@@ -261,6 +268,16 @@ for (const viewport of viewports) {
       )
       expect(inputPaddings.every((padding) => padding.left >= 44)).toBe(true)
       expect(inputPaddings[1].right).toBeGreaterThanOrEqual(44)
+
+      const placeholderFields = page.locator('input[placeholder]:visible, textarea[placeholder]:visible')
+      for (let index = 0; index < await placeholderFields.count(); index += 1) {
+        const field = placeholderFields.nth(index)
+        const colors = await getEffectiveColors(field, '::placeholder')
+        expect.soft(
+          contrastRatio(colors.foreground, colors.background),
+          `${await field.getAttribute('id') || 'field'} placeholder contrast`
+        ).toBeGreaterThanOrEqual(4.5)
+      }
 
       const undersizedTargets = await page.locator([
         'a[href]',
@@ -383,3 +400,78 @@ for (const viewport of viewports) {
     })
   }
 }
+
+test('agreement checkbox mode keeps its configured target and links accessible', async ({ page }) => {
+  const agreementSettings = {
+    ...publicSettings,
+    login_agreement_enabled: true,
+    login_agreement_mode: 'checkbox',
+    login_agreement_updated_at: '2026-07-18',
+    login_agreement_revision: 'agreement-baseline-v1',
+  }
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' })
+  await installDeterministicMocks(page, 'light', agreementSettings)
+  await page.goto('/login')
+
+  const checkbox = page.locator('#login-agreement-consent')
+  const label = page.locator('label[for="login-agreement-consent"]')
+  await expect(checkbox).toBeVisible()
+  await expect(label).toBeVisible()
+  const target = await checkbox.evaluate((input) => {
+    const associatedLabel = document.querySelector(`label[for="${input.id}"]`)
+    if (!associatedLabel) return { width: 0, height: 0 }
+    const inputRect = input.getBoundingClientRect()
+    const labelRect = associatedLabel.getBoundingClientRect()
+    const left = Math.min(inputRect.left, labelRect.left)
+    const top = Math.min(inputRect.top, labelRect.top)
+    const right = Math.max(inputRect.right, labelRect.right)
+    const bottom = Math.max(inputRect.bottom, labelRect.bottom)
+    return { width: right - left, height: bottom - top }
+  })
+  expect(target.width).toBeGreaterThanOrEqual(44)
+  expect(target.height).toBeGreaterThanOrEqual(44)
+
+  const agreementLinks = page.locator('#login-agreement-consent ~ div a')
+  await expect(agreementLinks).toHaveCount(2)
+  await expect(agreementLinks.nth(0)).toHaveAttribute('href', '/legal/terms')
+  await expect(agreementLinks.nth(1)).toHaveAttribute('href', '/legal/privacy')
+  for (let index = 0; index < await agreementLinks.count(); index += 1) {
+    const link = agreementLinks.nth(index)
+    const idleColors = await getEffectiveColors(link)
+    expect(contrastRatio(idleColors.foreground, idleColors.background)).toBeGreaterThanOrEqual(4.5)
+    await link.hover()
+    await link.evaluate((element) => element.getAnimations().forEach((animation) => animation.finish()))
+    const hoverColors = await getEffectiveColors(link)
+    expect(contrastRatio(hoverColors.foreground, hoverColors.background)).toBeGreaterThanOrEqual(4.5)
+  }
+
+  const agreementVisualViolations = await checkbox.evaluate((input) => {
+    const root = input.parentElement?.parentElement
+    if (!root) return ['agreement root missing']
+    return [root, ...root.querySelectorAll('*')].flatMap((element) => {
+      const rect = element.getBoundingClientRect()
+      const style = getComputedStyle(element)
+      if (rect.width === 0 || rect.height === 0 || style.visibility === 'hidden') return []
+      const radiusToPixels = (value: string) => value.endsWith('%')
+        ? Math.min(rect.width, rect.height) * Number.parseFloat(value) / 100
+        : Number.parseFloat(value)
+      const maxRadius = Math.max(...[
+        style.borderTopLeftRadius,
+        style.borderTopRightRadius,
+        style.borderBottomRightRadius,
+        style.borderBottomLeftRadius,
+      ].map(radiusToPixels))
+      return [
+        ...(maxRadius > 8.01 ? [`${element.tagName} radius ${maxRadius}px`] : []),
+        ...(style.backgroundImage.includes('gradient') ? [`${element.tagName} gradient`] : []),
+      ]
+    })
+  })
+  expect(agreementVisualViolations).toEqual([])
+  await expect(page.locator('[data-ui="decorative-orb"]')).toHaveCount(0)
+
+  await expect(page.locator('[data-ui="auth-primary"]')).toBeDisabled()
+  await checkbox.check()
+  await expect(page.locator('[data-ui="auth-primary"]')).toBeEnabled()
+})

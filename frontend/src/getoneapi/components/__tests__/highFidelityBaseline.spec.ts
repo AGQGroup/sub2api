@@ -11,6 +11,7 @@ import LoginView from '@/views/auth/LoginView.vue'
 import { useAppStore } from '@/stores/app'
 import type { PublicCatalog } from '@/getoneapi/catalog/types'
 import BrandLockup from '@/getoneapi/components/BrandLockup.vue'
+import CatalogMeta from '@/getoneapi/components/catalog/CatalogMeta.vue'
 import CatalogPreview from '@/getoneapi/components/catalog/CatalogPreview.vue'
 import GetOneAPIAuthLayout from '@/getoneapi/layouts/GetOneAPIAuthLayout.vue'
 import GetOneAPIUserLayout from '@/getoneapi/layouts/GetOneAPIUserLayout.vue'
@@ -190,6 +191,7 @@ describe('GetOneAPI high-fidelity component baseline', () => {
     document.body.replaceChildren()
     localStorage.clear()
     document.documentElement.classList.remove('dark')
+    i18n.global.locale.value = 'en'
     getPublicCatalogMock.mockReset()
     getPublicSettingsMock.mockReset().mockResolvedValue(settings)
     setLocaleMock.mockReset().mockResolvedValue(undefined)
@@ -386,7 +388,10 @@ describe('GetOneAPI high-fidelity component baseline', () => {
     expect(catalog.findAll('[data-ui="catalog-price"]')[0].text()).toContain('$2.00 / 1M')
     expect(catalog.get('[data-ui="catalog-tier"]').text()).toContain('0-100,000 tokens')
     expect(catalog.get('[data-ui="catalog-tier"]').text()).toContain('$4.80 / 1M')
-    expect(catalog.get('[data-ui="catalog-updated-at"]').text()).not.toBe('')
+    const updatedAt = catalog.get('[data-ui="catalog-updated-at"]')
+    expect(updatedAt.element.tagName).toBe('TIME')
+    expect(updatedAt.attributes('datetime')).toBe('2026-07-18T08:30:00Z')
+    expect(updatedAt.text()).toBe('Jul 18, 2026, 4:30 PM')
     expect(catalog.text()).not.toContain('channel')
     expect(catalog.text()).not.toContain('account count')
 
@@ -453,7 +458,8 @@ describe('GetOneAPI high-fidelity component baseline', () => {
 
   it('keeps disabled, loading, empty, and error pricing states explicit and retryable', async () => {
     const disabled = await mountCatalog(false)
-    expect(disabled.get('[data-catalog-state="disabled"]').text()).toContain('Billing rules')
+    expect(disabled.get('[data-catalog-state="disabled"]').text()).toContain('Service documentation')
+    expect(disabled.get('[data-catalog-state="disabled"] a').text()).toBe('Documentation')
 
     let resolveCatalog: ((catalog: PublicCatalog) => void) | undefined
     getPublicCatalogMock.mockImplementation(
@@ -478,15 +484,33 @@ describe('GetOneAPI high-fidelity component baseline', () => {
   it('derives documentation anchors, legal routes, and safe support presentation from settings', () => {
     const links = getPublicLinks(settings)
 
-    expect(links.documentation.map((link) => link.href)).toEqual([
-      'https://docs.example.test/guide?lang=en#quick-start',
-      'https://docs.example.test/guide?lang=en#billing',
-      'https://docs.example.test/guide?lang=en#refunds',
-    ])
+    expect(links.documentation).toEqual([{
+      label: 'Documentation',
+      href: 'https://docs.example.test/guide?lang=en',
+    }])
+    expect(links.documentation.map((link) => link.label)).not.toContain('Refund policy')
     expect(links.legal).toEqual([
       { label: 'Terms of service', href: '/legal/terms' },
     ])
     expect(links.support).toEqual({ label: 'support@example.test', href: '' })
+  })
+
+  it('formats catalog timestamps with the active locale and preserves invalid source text', async () => {
+    const catalogMeta = mount(CatalogMeta, {
+      props: { catalog: catalogFixture },
+      global: { plugins: [i18n] },
+    })
+
+    expect(catalogMeta.get('time').text()).toBe('Jul 18, 2026, 4:30 PM')
+
+    const invalidMeta = mount(CatalogMeta, {
+      props: { catalog: { ...catalogFixture, updated_at: 'not-a-date' } },
+      global: { plugins: [i18n] },
+    })
+    const invalidUpdatedAt = invalidMeta.get('[data-ui="catalog-updated-at"]')
+    expect(invalidUpdatedAt.element.tagName).toBe('SPAN')
+    expect(invalidUpdatedAt.attributes('datetime')).toBeUndefined()
+    expect(invalidUpdatedAt.text()).toBe('not-a-date')
   })
 
   it('reports operational only for an explicit healthy response', async () => {

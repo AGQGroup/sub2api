@@ -17,21 +17,10 @@ type PublicLinkSettings = Pick<
   'doc_url' | 'login_agreement_documents' | 'contact_info'
 >
 
-const documentationSections = [
-  { label: 'Quick start', hash: 'quick-start' },
-  { label: 'Billing rules', hash: 'billing' },
-  { label: 'Refund policy', hash: 'refunds' },
-] as const
-
 function documentationLinks(docUrl: string): PublicLink[] {
   const safeUrl = sanitizeUrl(docUrl)
   if (!safeUrl) return []
-
-  return documentationSections.map(({ label, hash }) => {
-    const url = new URL(safeUrl)
-    url.hash = hash
-    return { label, href: url.toString() }
-  })
+  return [{ label: 'Documentation', href: safeUrl }]
 }
 
 function legalLinks(settings: PublicLinkSettings): PublicLink[] {

@@ -14,7 +14,14 @@
     </div>
     <div>
       <dt>Updated</dt>
-      <dd data-ui="catalog-updated-at">{{ catalog.updated_at }}</dd>
+      <dd>
+        <time
+          v-if="updatedAt.valid"
+          data-ui="catalog-updated-at"
+          :datetime="catalog.updated_at"
+        >{{ updatedAt.text }}</time>
+        <span v-else data-ui="catalog-updated-at">{{ updatedAt.text }}</span>
+      </dd>
     </div>
     <div>
       <dt>Timezone</dt>
@@ -24,9 +31,33 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import i18n from '@/i18n'
 import type { PublicCatalog } from '@/getoneapi/catalog/types'
 
-defineProps<{ catalog: PublicCatalog }>()
+const props = defineProps<{ catalog: PublicCatalog }>()
+
+const updatedAt = computed(() => {
+  const source = props.catalog.updated_at
+  const date = new Date(source)
+  if (!source || Number.isNaN(date.getTime())) {
+    return { valid: false, text: source || 'Unavailable' }
+  }
+
+  const dateLocale = i18n.global.locale.value.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US'
+  try {
+    return {
+      valid: true,
+      text: new Intl.DateTimeFormat(dateLocale, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: props.catalog.timezone,
+      }).format(date),
+    }
+  } catch {
+    return { valid: false, text: source }
+  }
+})
 </script>
 
 <style scoped>

@@ -81,6 +81,18 @@
   color: var(--g1-text);
 }
 
+[data-surface^='getoneapi-'] input::placeholder,
+[data-surface^='getoneapi-'] textarea::placeholder {
+  color: var(--g1-text-tertiary);
+  opacity: 1;
+}
+
+[data-surface^='getoneapi-'] label[for='login-agreement-consent'] {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+
 [data-surface^='getoneapi-'] textarea {
   padding-top: 12px;
 }
