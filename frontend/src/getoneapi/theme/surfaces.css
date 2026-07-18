@@ -13,6 +13,16 @@
   cursor: pointer;
 }
 
+[data-surface^='getoneapi-'] {
+  --g1-link: #005eb8;
+  --g1-primary-button-hover: #0068d1;
+}
+
+.dark [data-surface^='getoneapi-'] {
+  --g1-link: #409cff;
+  --g1-primary-button-hover: var(--g1-primary-hover);
+}
+
 [data-surface^='getoneapi-'] button:hover,
 [data-surface^='getoneapi-'] .btn:hover {
   background: var(--g1-divider);
@@ -22,11 +32,24 @@
 [data-surface^='getoneapi-'] .btn[data-variant='primary'] {
   background: var(--g1-primary);
   color: #ffffff;
+  box-shadow: none;
 }
 
 [data-surface^='getoneapi-'] button[data-variant='primary']:hover,
 [data-surface^='getoneapi-'] .btn[data-variant='primary']:hover {
-  background: var(--g1-primary-hover);
+  background: var(--g1-primary-button-hover);
+}
+
+.dark [data-surface^='getoneapi-'] button[data-variant='primary'],
+.dark [data-surface^='getoneapi-'] .btn[data-variant='primary'] {
+  color: #001b33;
+}
+
+[data-surface^='getoneapi-'] button[data-ui='auth-password-toggle'] {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
 }
 
 [data-surface^='getoneapi-'] input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
@@ -43,6 +66,14 @@
 
 [data-surface^='getoneapi-'] textarea {
   padding-top: 12px;
+}
+
+[data-surface='getoneapi-auth'] :is(input#email, input#password) {
+  padding-left: 44px;
+}
+
+[data-surface='getoneapi-auth'] input#password {
+  padding-right: 44px;
 }
 
 [data-surface^='getoneapi-'] :is(a, button, input, select, textarea, [tabindex]):focus-visible {

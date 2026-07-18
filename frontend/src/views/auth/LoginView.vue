@@ -11,7 +11,7 @@
         </p>
       </div>
       <!-- Login Form -->
-      <form @submit.prevent="handleLogin" class="space-y-5">
+      <form :aria-busy="isLoading" @submit.prevent="handleLogin" class="space-y-5">
         <!-- Email Input -->
         <div>
           <label for="email" class="input-label">
@@ -58,6 +58,8 @@
             />
             <button
               type="button"
+              data-ui="auth-password-toggle"
+              :aria-label="`${showPassword ? 'Hide' : 'Show'} ${t('auth.passwordLabel')}`"
               @click="showPassword = !showPassword"
               :disabled="authActionDisabled"
               class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-dark-300"
@@ -92,6 +94,8 @@
         <!-- Submit Button -->
         <button
           type="submit"
+          data-ui="auth-primary"
+          data-variant="primary"
           :disabled="authActionDisabled || (turnstileEnabled && !turnstileToken)"
           class="btn btn-primary w-full"
         >
