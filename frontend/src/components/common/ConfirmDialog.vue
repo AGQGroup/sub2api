@@ -45,6 +45,7 @@ interface Props {
   confirmText?: string
   cancelText?: string
   danger?: boolean
+  surface?: 'legacy' | 'getoneapi'
 }
 
 interface Emits {

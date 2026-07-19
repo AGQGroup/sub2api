@@ -1,5 +1,19 @@
 <template>
+  <GetOneAPIPublicLayout v-if="appStore.getoneapiUserUIEnabled">
+    <DataState
+      state="empty"
+      :title="t('common.notFound')"
+      :message="t('common.pageNotFound')"
+    >
+      <template #actions>
+        <router-link to="/home" data-variant="primary">
+          {{ t('common.goHome') }}
+        </router-link>
+      </template>
+    </DataState>
+  </GetOneAPIPublicLayout>
   <div
+    v-else
     class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50 px-4 dark:bg-dark-950"
   >
     <!-- Background Decoration -->
@@ -80,10 +94,14 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { useAppStore } from '@/stores'
 import Icon from '@/components/icons/Icon.vue'
+import GetOneAPIPublicLayout from '@/getoneapi/layouts/GetOneAPIPublicLayout.vue'
+import DataState from '@/getoneapi/components/DataState.vue'
 
 const { t } = useI18n()
 const router = useRouter()
+const appStore = useAppStore()
 
 function goBack(): void {
   router.back()

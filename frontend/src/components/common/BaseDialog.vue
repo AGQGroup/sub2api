@@ -64,6 +64,7 @@ interface Props {
   closeOnClickOutside?: boolean
   showCloseButton?: boolean
   zIndex?: number
+  surface?: 'legacy' | 'getoneapi'
 }
 
 interface Emits {

@@ -470,6 +470,8 @@ interface Props {
   selectedKeys?: Array<string | number>
   /** Accessible label for a row selection checkbox. */
   selectionLabel?: string | ((row: any) => string)
+  /** Surface variant: 'legacy' (default) or 'getoneapi'. */
+  surface?: 'legacy' | 'getoneapi'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -480,7 +482,8 @@ const props = withDefaults(defineProps<Props>(), {
   defaultSortOrder: 'asc',
   serverSideSort: false,
   selectable: false,
-  selectedKeys: () => []
+  selectedKeys: () => [],
+  surface: 'legacy',
 })
 
 const sortKey = ref<string>('')

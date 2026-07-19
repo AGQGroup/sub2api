@@ -67,6 +67,7 @@ interface Props {
   actionTo?: string | object
   actionIcon?: boolean
   message?: string
+  surface?: 'legacy' | 'getoneapi'
 }
 
 const props = withDefaults(defineProps<Props>(), {

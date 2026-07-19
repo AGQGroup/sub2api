@@ -20,6 +20,7 @@ type SpinnerColor = 'primary' | 'secondary' | 'white' | 'gray'
 interface Props {
   size?: SpinnerSize
   color?: SpinnerColor
+  surface?: 'legacy' | 'getoneapi'
 }
 
 const props = withDefaults(defineProps<Props>(), {
