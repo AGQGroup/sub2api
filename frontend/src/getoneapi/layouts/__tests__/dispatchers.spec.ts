@@ -4,6 +4,7 @@ import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { i18n } from '@/i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import AuthLayout from '@/components/layout/AuthLayout.vue'
 import HomeView from '@/views/HomeView.vue'
@@ -273,9 +274,17 @@ describe('GetOneAPI surface dispatchers', () => {
     [GetOneAPIAuthLayout, 'getoneapi-auth'],
     [GetOneAPIUserLayout, 'getoneapi-user']
   ])('sets exactly one outer surface on %s', (Layout, surface) => {
+    const router = createFixtureRouter()
     const wrapper = mount(Layout, {
       slots: { default: '<div data-testid="layout-content" />' },
-      global: { plugins: [pinia] }
+      global: {
+        plugins: [pinia, router, i18n],
+        stubs: {
+          UserSidebar: { template: '<div />' },
+          UserBottomNav: { template: '<div />' },
+          UserHeader: { template: '<div />' },
+        }
+      }
     })
 
     expect(wrapper.findAll('[data-surface]')).toHaveLength(1)

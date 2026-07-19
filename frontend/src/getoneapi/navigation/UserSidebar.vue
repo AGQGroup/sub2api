@@ -1,0 +1,236 @@
+<template>
+  <aside
+    class="g1-sidebar hidden lg:flex"
+    aria-label="Main navigation"
+  >
+    <div class="g1-sidebar__brand">
+      <router-link to="/dashboard" class="g1-sidebar__logo" :aria-label="appStore.siteName">
+        <img
+          v-if="appStore.siteLogo"
+          :src="appStore.siteLogo"
+          :alt="appStore.siteName"
+          class="g1-sidebar__logo-img"
+        />
+        <Icon v-else name="home" size="lg" aria-hidden="true" />
+      </router-link>
+      <router-link to="/dashboard" class="g1-sidebar__title">
+        {{ appStore.siteName }}
+      </router-link>
+    </div>
+
+    <nav class="g1-sidebar__nav">
+      <ul class="g1-sidebar__list">
+        <li v-for="item in coreUserNavigation" :key="item.path">
+          <router-link
+            :to="item.path"
+            class="g1-sidebar__link"
+            :class="{ 'g1-sidebar__link--active': isActive(item.path) }"
+            :data-ui="'nav-item'"
+          >
+            <Icon :name="(item.icon as any)" size="md" aria-hidden="true" />
+            <span class="g1-sidebar__label">{{ t(item.labelKey) }}</span>
+          </router-link>
+        </li>
+      </ul>
+
+      <div class="g1-sidebar__divider" aria-hidden="true" />
+
+      <p class="g1-sidebar__section-label">{{ t('getoneapi.nav.finance') }}</p>
+      <ul class="g1-sidebar__list">
+        <li v-for="item in secondaryNavigation" :key="item.path">
+          <router-link
+            :to="item.path"
+            class="g1-sidebar__link"
+            :class="{ 'g1-sidebar__link--active': isActive(item.path) }"
+            :data-ui="'nav-item'"
+          >
+            <Icon :name="(item.icon as any)" size="md" aria-hidden="true" />
+            <span class="g1-sidebar__label">{{ t(item.labelKey) }}</span>
+          </router-link>
+        </li>
+      </ul>
+
+      <div class="g1-sidebar__divider" aria-hidden="true" />
+
+      <p class="g1-sidebar__section-label">{{ t('getoneapi.nav.tools') }}</p>
+      <ul class="g1-sidebar__list">
+        <li v-for="item in utilityNavigation" :key="item.path">
+          <router-link
+            :to="item.path"
+            class="g1-sidebar__link"
+            :class="{ 'g1-sidebar__link--active': isActive(item.path) }"
+            :data-ui="'nav-item'"
+          >
+            <Icon :name="(item.icon as any)" size="md" aria-hidden="true" />
+            <span class="g1-sidebar__label">{{ t(item.labelKey) }}</span>
+          </router-link>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="g1-sidebar__footer">
+      <a
+        v-if="appStore.docUrl"
+        :href="appStore.docUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="g1-sidebar__link"
+      >
+        <Icon name="book" size="md" aria-hidden="true" />
+        <span class="g1-sidebar__label">{{ t('getoneapi.nav.docs') }}</span>
+      </a>
+      <button
+        type="button"
+        class="g1-sidebar__link g1-sidebar__logout"
+        aria-label="Log out"
+        @click="handleLogout"
+      >
+        <Icon name="login" size="md" aria-hidden="true" />
+        <span class="g1-sidebar__label">{{ t('getoneapi.nav.logout') }}</span>
+      </button>
+    </div>
+  </aside>
+</template>
+
+<script setup lang="ts">
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useAppStore, useAuthStore } from '@/stores'
+import Icon from '@/components/icons/Icon.vue'
+import { coreUserNavigation, secondaryNavigation, utilityNavigation } from './items'
+
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const appStore = useAppStore()
+const authStore = useAuthStore()
+
+function isActive(path: string): boolean {
+  if (path === '/dashboard') return route.path === '/dashboard'
+  return route.path.startsWith(path)
+}
+
+async function handleLogout(): Promise<void> {
+  await authStore.logout()
+  await router.push('/login')
+}
+</script>
+
+<style scoped>
+.g1-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  width: 260px;
+  flex-direction: column;
+  border-right: 1px solid var(--g1-divider);
+  background: var(--g1-surface);
+}
+
+.g1-sidebar__brand {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--g1-divider);
+}
+
+.g1-sidebar__logo {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--g1-radius-sm);
+  overflow: hidden;
+}
+
+.g1-sidebar__logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.g1-sidebar__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--g1-text);
+  text-decoration: none;
+}
+
+.g1-sidebar__nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 8px;
+}
+
+.g1-sidebar__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.g1-sidebar__divider {
+  height: 1px;
+  margin: 8px 12px;
+  background: var(--g1-divider);
+}
+
+.g1-sidebar__section-label {
+  margin: 8px 12px 4px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--g1-text-tertiary);
+}
+
+.g1-sidebar__link {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  border-radius: var(--g1-radius-md);
+  color: var(--g1-text);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.g1-sidebar__link:hover {
+  background: var(--g1-control);
+}
+
+.g1-sidebar__link--active {
+  background: var(--g1-control);
+  font-weight: 600;
+  color: var(--g1-primary);
+}
+
+.g1-sidebar__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.g1-sidebar__footer {
+  padding: 8px;
+  border-top: 1px solid var(--g1-divider);
+}
+
+.g1-sidebar__logout {
+  color: var(--g1-text-secondary);
+}
+</style>
