@@ -2,6 +2,12 @@
   <AppLayout>
     <TablePageLayout>
       <template #filters>
+        <FirstRequestChecklist
+          v-if="appStore.getoneapiUserUIEnabled"
+          :facts="{ keyCount: pagination.total, configurationOpened, totalRequests: dashboardRequestCount }"
+          @create-key="showCreateModal = true"
+          class="mb-4"
+        />
         <div class="flex flex-col gap-3">
           <div class="flex flex-wrap items-center gap-3">
             <SearchInput
@@ -422,7 +428,12 @@
           </template>
 
           <template #empty>
+            <KeyEmptyState
+              v-if="appStore.getoneapiUserUIEnabled"
+              @create-key="showCreateModal = true"
+            />
             <EmptyState
+              v-else
               :title="t('keys.noKeysYet')"
               :description="t('keys.createFirstKey')"
               :action-text="t('keys.createKey')"
@@ -1140,6 +1151,8 @@ import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 	import EndpointPopover from '@/components/keys/EndpointPopover.vue'
 	import GroupBadge from '@/components/common/GroupBadge.vue'
 	import GroupOptionItem from '@/components/common/GroupOptionItem.vue'
+	import FirstRequestChecklist from '@/getoneapi/components/onboarding/FirstRequestChecklist.vue'
+	import KeyEmptyState from '@/getoneapi/components/onboarding/KeyEmptyState.vue'
 	import type { ApiKey, Group, PublicSettings, SubscriptionType, GroupPlatform, UpdateApiKeyRequest } from '@/types'
 import type { Column } from '@/components/common/types'
 import type { BatchApiKeyUsageStats } from '@/api/usage'
@@ -1311,6 +1324,8 @@ const dropdownRef = ref<HTMLElement | null>(null)
 const columnDropdownRef = ref<HTMLElement | null>(null)
 const dropdownPosition = ref<{ top?: number; bottom?: number; left: number } | null>(null)
 const groupButtonRefs = ref<Map<number, HTMLElement>>(new Map())
+const configurationOpened = ref(false)
+const dashboardRequestCount = ref(0)
 let abortController: AbortController | null = null
 
 // Get the currently selected key for group change
@@ -1532,6 +1547,7 @@ const loadPublicSettings = async () => {
 const openUseKeyModal = (key: ApiKey) => {
   selectedKey.value = key
   showUseKeyModal.value = true
+  configurationOpened.value = true
 }
 
 const closeUseKeyModal = () => {
@@ -1950,12 +1966,23 @@ function formatResetTime(resetAt: string | null): string {
   return `${mins}m`
 }
 
+async function loadFirstRequestFacts() {
+  if (!appStore.getoneapiUserUIEnabled) return
+  try {
+    const dashboard = await usageAPI.getDashboardStats()
+    dashboardRequestCount.value = dashboard.total_requests
+  } catch {
+    dashboardRequestCount.value = 0
+  }
+}
+
 onMounted(() => {
   loadSavedColumns()
   loadApiKeys()
   loadGroups()
   loadUserGroupRates()
   loadPublicSettings()
+  loadFirstRequestFacts()
   document.addEventListener('click', closeGroupSelector)
   resetTimer = setInterval(() => { now.value = new Date() }, 60000)
 })
