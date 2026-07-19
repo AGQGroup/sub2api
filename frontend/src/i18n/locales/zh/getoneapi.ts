@@ -30,6 +30,7 @@ export default {
       balance: '余额',
       requestsToday: '今日请求',
       activeKeys: '活跃密钥',
+      status: '状态',
       quickActions: '快捷操作',
       createKey: '创建 API 密钥',
       topUp: '充值',

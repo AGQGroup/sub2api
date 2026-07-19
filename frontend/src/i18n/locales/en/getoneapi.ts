@@ -30,6 +30,7 @@ export default {
       balance: 'Balance',
       requestsToday: 'Requests today',
       activeKeys: 'Active keys',
+      status: 'Status',
       quickActions: 'Quick actions',
       createKey: 'Create API key',
       topUp: 'Top up balance',

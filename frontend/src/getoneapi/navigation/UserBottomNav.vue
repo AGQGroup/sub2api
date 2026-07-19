@@ -3,21 +3,21 @@
     class="g1-bottom-nav lg:hidden"
     data-ui="user-bottom-nav"
     aria-label="Mobile navigation"
-    :style="{ paddingBottom: `calc(8px + env(safe-area-inset-bottom, 0px))` }"
+    :style="{ gridTemplateColumns: `repeat(${visibleNav.length}, 1fr)`, paddingBottom: `calc(8px + env(safe-area-inset-bottom, 0px))` }"
   >
-    <template v-for="item in visibleNav" :key="item.path">
-      <router-link
-        :to="item.path"
-        class="g1-bottom-nav__link"
-        :class="{ 'g1-bottom-nav__link--active': isActive(item.path) }"
-        :data-ui="'bottom-nav-item'"
-        :aria-label="t(item.labelKey)"
-        :aria-current="isActive(item.path) ? 'page' : undefined"
-      >
-        <Icon :name="item.icon" size="md" aria-hidden="true" />
-        <span class="g1-bottom-nav__label">{{ t(item.labelKey) }}</span>
-      </router-link>
-    </template>
+    <router-link
+      v-for="item in visibleNav"
+      :key="item.path"
+      :to="item.path"
+      class="g1-bottom-nav__link"
+      :class="{ 'g1-bottom-nav__link--active': isActive(item.path) }"
+      :data-ui="'bottom-nav-item'"
+      :aria-label="t(item.labelKey)"
+      :aria-current="isActive(item.path) ? 'page' : undefined"
+    >
+      <Icon :name="item.icon" size="md" aria-hidden="true" />
+      <span class="g1-bottom-nav__label">{{ t(item.labelKey) }}</span>
+    </router-link>
   </nav>
 </template>
 
@@ -54,9 +54,15 @@ function isActive(path: string): boolean {
   inset: auto 0 0 0;
   z-index: 30;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
   border-top: 1px solid var(--g1-divider);
   background: var(--g1-surface);
+  backdrop-filter: blur(20px);
+}
+
+@supports not (backdrop-filter: blur(20px)) {
+  .g1-bottom-nav {
+    background: var(--g1-surface);
+  }
 }
 
 .g1-bottom-nav__link {
@@ -65,11 +71,11 @@ function isActive(path: string): boolean {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  padding: 8px 4px;
-  color: var(--g1-text-secondary);
+  gap: 3px;
+  padding: 6px 4px;
+  color: var(--g1-text-tertiary);
   text-decoration: none;
-  transition: color 150ms ease;
+  transition: color 120ms ease;
 }
 
 .g1-bottom-nav__link--active {
@@ -77,8 +83,8 @@ function isActive(path: string): boolean {
 }
 
 .g1-bottom-nav__label {
-  font-size: 11px;
-  font-weight: 500;
+  font-size: 10px;
+  font-weight: 600;
   line-height: 1.2;
 }
 </style>

@@ -1,109 +1,84 @@
 <template>
   <div data-ui="dashboard-experience" class="g1-dashboard">
-    <section data-ui="balance-health" class="g1-dashboard__row">
-      <div v-if="loading" class="g1-skeleton-block" />
-      <div v-else class="g1-dashboard__metrics">
-        <div class="g1-metric">
-          <span class="g1-metric__label">{{ t('getoneapi.dashboard.balance') }}</span>
-          <span class="g1-metric__value">{{ balanceText }}</span>
-        </div>
-        <div class="g1-metric">
-          <span class="g1-metric__label">{{ t('getoneapi.dashboard.requestsToday') }}</span>
-          <span class="g1-metric__value">{{ stats?.today_requests ?? '—' }}</span>
-        </div>
-        <div class="g1-metric">
-          <span class="g1-metric__label">{{ t('getoneapi.dashboard.activeKeys') }}</span>
-          <span class="g1-metric__value">{{ stats?.active_api_keys ?? '—' }}</span>
-        </div>
+    <section data-ui="metrics" class="g1-dashboard__metrics-row">
+      <div class="g1-metric-card" data-ui="metric-balance">
+        <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.balance') }}</span>
+        <span class="g1-metric-card__value">{{ balanceText }}</span>
       </div>
-      <div v-if="!loading && stats" class="g1-dashboard__health">
-        <span
-          class="g1-health-dot"
-          :class="healthClass"
-          aria-hidden="true"
+      <div class="g1-metric-card" data-ui="metric-requests">
+        <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.requestsToday') }}</span>
+        <span class="g1-metric-card__value">{{ formatNumber(stats?.today_requests) }}</span>
+      </div>
+      <div class="g1-metric-card" data-ui="metric-keys">
+        <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.activeKeys') }}</span>
+        <span class="g1-metric-card__value">{{ formatNumber(stats?.active_api_keys) }}</span>
+      </div>
+      <div class="g1-metric-card" data-ui="metric-health">
+        <div class="g1-metric-card__health-row">
+          <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.status') }}</span>
+          <span class="g1-health-dot" :class="healthClass" aria-hidden="true" />
+        </div>
+        <span class="g1-metric-card__value g1-metric-card__value--small">{{ healthLabel }}</span>
+      </div>
+    </section>
+
+    <div class="g1-dashboard__grid">
+      <section data-ui="first-request-checklist" class="g1-dashboard__main">
+        <FirstRequestChecklist
+          :facts="firstRequestFacts"
+          @create-key="$emit('createKey')"
         />
-        <span class="g1-health-label">{{ healthLabel }}</span>
-      </div>
-    </section>
+      </section>
 
-    <section data-ui="first-request-checklist" class="g1-dashboard__section">
-      <FirstRequestChecklist
-        :facts="firstRequestFacts"
-        @create-key="$emit('createKey')"
-      />
-    </section>
+      <section data-ui="quick-actions" class="g1-dashboard__side">
+        <h3 class="g1-section-title">{{ t('getoneapi.dashboard.quickActions') }}</h3>
+        <div class="g1-quick-actions">
+          <button type="button" data-ui="action-create-key" class="g1-quick-action" @click="$emit('createKey')">
+            <span class="g1-quick-action__icon"><Icon name="key" size="md" aria-hidden="true" /></span>
+            <span class="g1-quick-action__label">{{ t('getoneapi.dashboard.createKey') }}</span>
+          </button>
+          <router-link v-if="appStore.cachedPublicSettings?.payment_enabled !== false" to="/purchase" class="g1-quick-action">
+            <span class="g1-quick-action__icon"><Icon name="creditCard" size="md" aria-hidden="true" /></span>
+            <span class="g1-quick-action__label">{{ t('getoneapi.dashboard.topUp') }}</span>
+          </router-link>
+          <router-link v-if="appStore.cachedPublicSettings?.available_channels_enabled !== false" to="/available-channels" class="g1-quick-action">
+            <span class="g1-quick-action__icon"><Icon name="server" size="md" aria-hidden="true" /></span>
+            <span class="g1-quick-action__label">{{ t('getoneapi.dashboard.services') }}</span>
+          </router-link>
+        </div>
+      </section>
+    </div>
 
-    <section data-ui="quick-actions" class="g1-dashboard__section">
-      <h3 class="g1-section-title">{{ t('getoneapi.dashboard.quickActions') }}</h3>
-      <div class="g1-actions">
-        <button
-          type="button"
-          data-ui="action-create-key"
-          class="g1-action-card"
-          @click="$emit('createKey')"
-        >
-          <Icon name="key" size="lg" aria-hidden="true" />
-          <span>{{ t('getoneapi.dashboard.createKey') }}</span>
-        </button>
-        <router-link to="/purchase" class="g1-action-card">
-          <Icon name="creditCard" size="lg" aria-hidden="true" />
-          <span>{{ t('getoneapi.dashboard.topUp') }}</span>
-        </router-link>
-        <router-link to="/available-channels" class="g1-action-card">
-          <Icon name="server" size="lg" aria-hidden="true" />
-          <span>{{ t('getoneapi.dashboard.services') }}</span>
-        </router-link>
-      </div>
-    </section>
-
-    <section data-ui="usage-trend" class="g1-dashboard__section">
-      <h3 class="g1-section-title">{{ t('getoneapi.dashboard.recentActivity') }}</h3>
-      <div v-if="!stats" class="g1-empty-note">
-        <p>{{ t('getoneapi.dashboard.noActivity') }}</p>
-        <button
-          type="button"
-          data-variant="primary"
-          data-ui="action-create-key"
-          @click="$emit('createKey')"
-        >
-          {{ t('getoneapi.dashboard.createYourFirstKey') }}
+    <section data-ui="recent-requests" class="g1-dashboard__card">
+      <div class="g1-dashboard__card-hd">
+        <h3 class="g1-section-title">{{ t('getoneapi.dashboard.recentRequests') }}</h3>
+        <button type="button" class="g1-text-btn" @click="$emit('refresh')">
+          <Icon name="refresh" size="sm" aria-hidden="true" />
+          {{ t('common.refresh') }}
         </button>
       </div>
-      <p v-else-if="loadingCharts" class="g1-empty-note">{{ t('getoneapi.dashboard.loadingCharts') }}</p>
-      <div v-else-if="trend?.length" class="g1-trend-summary">
-        <p class="g1-trend-text">
-          {{ trend.length }} data points loaded.
-          <button type="button" class="g1-link-btn" @click="$emit('rangeChange')">Change date range</button>
-        </p>
-      </div>
-      <div v-else class="g1-empty-note">
-        <p>{{ t('getoneapi.dashboard.noRecentUsage') }}</p>
-      </div>
-    </section>
-
-    <section data-ui="recent-requests" class="g1-dashboard__section">
-      <h3 class="g1-section-title">{{ t('getoneapi.dashboard.recentRequests') }}</h3>
       <div v-if="loadingUsage" class="g1-table-skeleton">
         <div v-for="r in 3" :key="r" class="g1-table-row-skel" />
       </div>
-      <div v-else-if="!recentUsage?.length" class="g1-empty-note">
+      <div v-else-if="!recentUsage?.length" class="g1-card-empty">
+        <Icon name="inbox" size="lg" aria-hidden="true" class="g1-card-empty__icon" />
         <p>{{ t('getoneapi.dashboard.noRequests') }}</p>
       </div>
-      <table v-else class="g1-simple-table">
+      <table v-else class="g1-table">
         <thead>
           <tr>
             <th>{{ t('getoneapi.dashboard.model') }}</th>
-            <th>{{ t('getoneapi.dashboard.tokens') }}</th>
-            <th>{{ t('getoneapi.dashboard.cost') }}</th>
-            <th>{{ t('getoneapi.dashboard.time') }}</th>
+            <th class="g1-table__num">{{ t('getoneapi.dashboard.tokens') }}</th>
+            <th class="g1-table__num">{{ t('getoneapi.dashboard.cost') }}</th>
+            <th class="g1-table__num">{{ t('getoneapi.dashboard.time') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in recentUsage" :key="item.id">
-            <td class="truncate max-w-[140px]">{{ item.model || '—' }}</td>
-            <td class="tabular-nums">{{ item.input_tokens + item.output_tokens }}</td>
-            <td class="tabular-nums">{{ formatCost(item.actual_cost) }}</td>
-            <td class="tabular-nums">{{ formatTime(item.created_at) }}</td>
+            <td class="g1-table__model">{{ item.model || '—' }}</td>
+            <td class="g1-table__num tabular-nums">{{ formatTokens(item.input_tokens + item.output_tokens) }}</td>
+            <td class="g1-table__num tabular-nums">{{ formatCost(item.actual_cost) }}</td>
+            <td class="g1-table__num g1-table__time tabular-nums">{{ formatTime(item.created_at) }}</td>
           </tr>
         </tbody>
       </table>
@@ -114,6 +89,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAppStore } from '@/stores'
 import Icon from '@/components/icons/Icon.vue'
 import FirstRequestChecklist from '@/getoneapi/components/onboarding/FirstRequestChecklist.vue'
 import type { FirstRequestFacts } from '@/getoneapi/adapters/firstRequestProgress'
@@ -121,6 +97,7 @@ import type { UserDashboardStats } from '@/api/usage'
 import type { User, TrendDataPoint, ModelStat, UsageLog, PlatformQuotaItem } from '@/types'
 
 const { t } = useI18n()
+const appStore = useAppStore()
 
 const props = withDefaults(
   defineProps<{
@@ -136,35 +113,36 @@ const props = withDefaults(
     firstRequestFacts: FirstRequestFacts
     healthStatus?: 'operational' | 'unknown'
   }>(),
-  {
-    platformQuotas: null,
-    trend: null,
-    models: null,
-    recentUsage: null,
-    healthStatus: 'unknown',
-  },
+  { platformQuotas: null, trend: null, models: null, recentUsage: null, healthStatus: 'unknown' },
 )
 
-defineEmits<{
-  createKey: []
-  refresh: []
-  rangeChange: []
-}>()
+defineEmits<{ createKey: []; refresh: []; rangeChange: [] }>()
 
 const balanceText = computed(() => {
-  if (!props.user?.balance) return '—'
+  if (props.user?.balance == null) return '—'
   return `$${props.user.balance.toFixed(2)}`
 })
 
-const healthClass = computed(() => {
-  if (props.healthStatus === 'operational') return 'g1-health-dot--ok'
-  return 'g1-health-dot--unknown'
-})
+const healthClass = computed(() =>
+  props.healthStatus === 'operational' ? 'g1-health-dot--ok' : 'g1-health-dot--unknown',
+)
 
-const healthLabel = computed(() => {
-  if (props.healthStatus === 'operational') return t('getoneapi.dashboard.statusOperational')
-  return t('getoneapi.dashboard.statusUnknown')
-})
+const healthLabel = computed(() =>
+  props.healthStatus === 'operational'
+    ? t('getoneapi.dashboard.statusOperational')
+    : t('getoneapi.dashboard.statusUnknown'),
+)
+
+function formatNumber(value?: number): string {
+  if (value == null) return '—'
+  return value.toLocaleString()
+}
+
+function formatTokens(value: number): string {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`
+  return String(value)
+}
 
 function formatCost(value?: number): string {
   if (value == null) return '—'
@@ -186,42 +164,47 @@ function formatTime(value?: string): string {
   gap: 24px;
 }
 
-.g1-dashboard__row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+.g1-dashboard__metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
 }
 
-.g1-dashboard__metrics {
-  display: flex;
-  gap: 32px;
-}
-
-.g1-metric {
+.g1-metric-card {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  padding: 20px;
+  border: 1px solid var(--g1-divider);
+  border-radius: var(--g1-radius-md);
+  background: var(--g1-surface);
 }
 
-.g1-metric__label {
-  font-size: 13px;
-  color: var(--g1-text-secondary);
+.g1-metric-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--g1-text-tertiary);
 }
 
-.g1-metric__value {
-  font-size: 24px;
+.g1-metric-card__value {
+  font-size: 32px;
   font-weight: 700;
   color: var(--g1-text);
   font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
-.g1-dashboard__health {
+.g1-metric-card__value--small {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.g1-metric-card__health-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--g1-text-secondary);
+  justify-content: space-between;
 }
 
 .g1-health-dot {
@@ -236,7 +219,18 @@ function formatTime(value?: string): string {
   background: var(--g1-success);
 }
 
-.g1-dashboard__section {
+.g1-dashboard__grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.g1-dashboard__main {
+  min-width: 0;
+}
+
+.g1-dashboard__side {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -244,118 +238,174 @@ function formatTime(value?: string): string {
 
 .g1-section-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--g1-text);
 }
 
-.g1-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
+.g1-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.g1-action-card {
+.g1-quick-action {
   display: flex;
-  min-height: 56px;
+  min-height: 44px;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 0 12px;
   border-radius: var(--g1-radius-md);
-  border: 1px solid var(--g1-divider);
-  background: var(--g1-surface);
   color: var(--g1-text);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   text-decoration: none;
+  background: transparent;
+  border: none;
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: background-color 120ms ease;
 }
 
-.g1-action-card:hover {
+.g1-quick-action:hover {
   background: var(--g1-control);
 }
 
-.g1-empty-note {
-  padding: 32px;
+.g1-quick-action__icon {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--g1-radius-sm);
+  background: var(--g1-control);
+  color: var(--g1-primary);
+  flex-shrink: 0;
+}
+
+.g1-quick-action__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.g1-dashboard__card {
   border: 1px solid var(--g1-divider);
   border-radius: var(--g1-radius-md);
-  text-align: center;
-  color: var(--g1-text-secondary);
+  background: var(--g1-surface);
+  overflow: hidden;
 }
 
-.g1-empty-note p {
-  margin: 0;
-  font-size: 15px;
+.g1-dashboard__card-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--g1-divider);
 }
 
-.g1-empty-note button {
-  margin-top: 12px;
-}
-
-.g1-skeleton-block {
-  height: 56px;
-  width: 100%;
+.g1-text-btn {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
   border-radius: var(--g1-radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--g1-link);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.g1-text-btn:hover {
   background: var(--g1-control);
 }
 
 .g1-table-skeleton {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
 }
 
 .g1-table-row-skel {
-  height: 40px;
+  height: 45px;
   width: 100%;
-  border-radius: var(--g1-radius-sm);
   background: var(--g1-control);
 }
 
-.g1-simple-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid var(--g1-divider);
-  border-radius: var(--g1-radius-md);
-  overflow: hidden;
+.g1-table-row-skel + .g1-table-row-skel {
+  border-top: 1px solid var(--g1-surface);
 }
 
-.g1-simple-table th,
-.g1-simple-table td {
-  padding: 10px 16px;
+.g1-card-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: var(--g1-text-tertiary);
+}
+
+.g1-card-empty p {
+  margin: 0;
   font-size: 14px;
+  color: var(--g1-text-secondary);
+}
+
+.g1-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.g1-table th,
+.g1-table td {
+  padding: 12px 20px;
+  font-size: 13px;
   text-align: left;
   border-bottom: 1px solid var(--g1-divider);
 }
 
-.g1-simple-table th {
-  background: var(--g1-control);
-  color: var(--g1-text-secondary);
+.g1-table th {
+  font-size: 12px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--g1-text-tertiary);
+  background: var(--g1-control);
 }
 
-.g1-simple-table td {
-  color: var(--g1-text);
+.g1-table__num {
+  text-align: right;
 }
 
-.g1-simple-table tr:last-child td {
+.g1-table__time {
+  color: var(--g1-text-secondary);
+}
+
+.g1-table__model {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.g1-table tr:last-child td {
   border-bottom: none;
 }
 
-.g1-trend-text {
-  margin: 0;
-  color: var(--g1-text-secondary);
-  font-size: 14px;
-}
+@media (max-width: 767px) {
+  .g1-dashboard__grid {
+    grid-template-columns: 1fr;
+  }
 
-.g1-link-btn {
-  min-height: auto;
-  padding: 0;
-  background: none;
-  color: var(--g1-link);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
+  .g1-dashboard__metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .g1-metric-card__value {
+    font-size: 24px;
+  }
 }
 </style>
