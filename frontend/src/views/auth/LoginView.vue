@@ -14,19 +14,24 @@
           <label for="email" class="input-label">
             {{ t('auth.emailLabel') }}
           </label>
-          <input
-            id="email"
-            v-model="formData.email"
-            type="email"
-            required
-            autofocus
-            autocomplete="email"
-            :disabled="authActionDisabled"
-            class="input"
-            :class="{ 'input-error': errors.email }"
-            :placeholder="t('auth.emailPlaceholder')"
-          />
-          <p v-if="errors.email" data-ui="auth-field-error" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.email }}</p>
+          <div class="relative">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+              <Icon name="mail" size="md" class="text-gray-400 dark:text-dark-500" />
+            </div>
+            <input
+              id="email"
+              v-model="formData.email"
+              type="email"
+              required
+              autofocus
+              autocomplete="email"
+              :disabled="authActionDisabled"
+              class="input"
+              :class="{ 'input-error': errors.email }"
+              :placeholder="t('auth.emailPlaceholder')"
+            />
+          </div>
+          <p v-if="errors.email" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.email }}</p>
         </div>
 
         <div>
@@ -34,6 +39,9 @@
             {{ t('auth.passwordLabel') }}
           </label>
           <div class="relative">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+              <Icon name="lock" size="md" class="text-gray-400 dark:text-dark-500" />
+            </div>
             <input
               id="password"
               v-model="formData.password"

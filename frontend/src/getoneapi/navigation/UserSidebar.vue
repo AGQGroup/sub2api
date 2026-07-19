@@ -20,7 +20,7 @@
 
     <nav class="g1-sidebar__nav">
       <ul class="g1-sidebar__list">
-        <li v-for="item in coreUserNavigation" :key="item.path">
+        <li v-for="item in visibleCoreNav" :key="item.path">
           <router-link
             :to="item.path"
             class="g1-sidebar__link"
@@ -105,6 +105,15 @@ const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
 const authStore = useAuthStore()
+
+const visibleCoreNav = computed(() =>
+  coreUserNavigation.filter((item) => {
+    if (item.path === '/available-channels') {
+      return appStore.cachedPublicSettings?.available_channels_enabled !== false
+    }
+    return true
+  }),
+)
 
 const visibleSecondaryNav = computed(() =>
   secondaryNavigation.filter((item) => {

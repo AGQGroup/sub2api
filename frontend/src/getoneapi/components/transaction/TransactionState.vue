@@ -20,11 +20,11 @@
 
     <dl v-if="amount || orderId" class="g1-transaction-state__details">
       <div v-if="orderId">
-        <dt>Order</dt>
+        <dt>{{ t('getoneapi.transaction.orderLabel') }}</dt>
         <dd class="tabular-nums">#{{ orderId }}</dd>
       </div>
       <div v-if="amount">
-        <dt>Amount</dt>
+        <dt>{{ t('getoneapi.transaction.amountLabel') }}</dt>
         <dd class="tabular-nums">{{ formattedAmount }}</dd>
       </div>
     </dl>

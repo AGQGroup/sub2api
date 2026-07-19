@@ -70,7 +70,13 @@
         </button>
       </div>
       <p v-else-if="loadingCharts" class="g1-empty-note">{{ t('getoneapi.dashboard.loadingCharts') }}</p>
-      <div v-else-if="!trend?.length" class="g1-empty-note">
+      <div v-else-if="trend?.length" class="g1-trend-summary">
+        <p class="g1-trend-text">
+          {{ trend.length }} data points loaded.
+          <button type="button" class="g1-link-btn" @click="$emit('rangeChange')">Change date range</button>
+        </p>
+      </div>
+      <div v-else class="g1-empty-note">
         <p>{{ t('getoneapi.dashboard.noRecentUsage') }}</p>
       </div>
     </section>
@@ -335,5 +341,21 @@ function formatTime(value?: string): string {
 
 .g1-simple-table tr:last-child td {
   border-bottom: none;
+}
+
+.g1-trend-text {
+  margin: 0;
+  color: var(--g1-text-secondary);
+  font-size: 14px;
+}
+
+.g1-link-btn {
+  min-height: auto;
+  padding: 0;
+  background: none;
+  color: var(--g1-link);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }
 </style>

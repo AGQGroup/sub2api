@@ -8,14 +8,14 @@
       v-else-if="isPending"
       state="processing"
       :amount="(order as any)?.pay_amount ?? (order as any)?.amount"
-      :currency="(order as any)?.currency"
+      :currency="(order as any)?.currency || normalizedCurrency"
       :order-id="(order as any)?.id ? String((order as any).id) : (order as any)?.out_trade_no"
     />
     <TransactionState
       v-else-if="isSuccess"
       state="succeeded"
       :amount="(order as any)?.pay_amount ?? (order as any)?.amount"
-      :currency="(order as any)?.currency"
+      :currency="(order as any)?.currency || normalizedCurrency"
       :order-id="(order as any)?.id ? String((order as any).id) : (order as any)?.out_trade_no"
     >
       <router-link to="/dashboard" data-variant="primary">
@@ -23,10 +23,28 @@
       </router-link>
     </TransactionState>
     <TransactionState
+      v-else-if="orderStatus === 'CANCELLED'"
+      state="cancelled"
+      :order-id="(order as any)?.id ? String((order as any).id) : (order as any)?.out_trade_no"
+    >
+      <router-link to="/purchase" data-variant="primary">
+        {{ t('payment.result.backToRecharge') }}
+      </router-link>
+    </TransactionState>
+    <TransactionState
+      v-else-if="orderStatus === 'EXPIRED'"
+      state="expired"
+      :order-id="(order as any)?.id ? String((order as any).id) : (order as any)?.out_trade_no"
+    >
+      <router-link to="/purchase" data-variant="primary">
+        {{ t('payment.result.backToRecharge') }}
+      </router-link>
+    </TransactionState>
+    <TransactionState
       v-else
       state="failed"
       :amount="(order as any)?.pay_amount ?? (order as any)?.amount"
-      :currency="(order as any)?.currency"
+      :currency="(order as any)?.currency || normalizedCurrency"
       :order-id="(order as any)?.id ? String((order as any).id) : (order as any)?.out_trade_no"
       retryable
     >
@@ -164,6 +182,14 @@ type ResolvedOrder = PaymentOrder | PublicOrderVerifyResult
 const order = ref<ResolvedOrder | null>(null)
 const loading = ref(true)
 const currency = ref('CNY')
+
+const orderStatus = computed(() =>
+  (order.value as any)?.status as string | undefined,
+)
+
+const normalizedCurrency = computed(() =>
+  normalizePaymentCurrency(currency.value),
+)
 
 interface ReturnInfo {
   outTradeNo: string

@@ -90,6 +90,8 @@ export default {
       cancelledDesc: 'This order has been cancelled.',
       expired: 'Payment expired',
       expiredDesc: 'This order has expired.',
+      orderLabel: 'Order',
+      amountLabel: 'Amount',
     },
   },
 }

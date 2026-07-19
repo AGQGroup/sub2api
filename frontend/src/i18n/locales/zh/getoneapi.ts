@@ -90,6 +90,8 @@ export default {
       cancelledDesc: '此订单已被取消。',
       expired: '支付已过期',
       expiredDesc: '此订单已过期。',
+      orderLabel: '订单',
+      amountLabel: '金额',
     },
   },
 }
