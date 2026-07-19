@@ -37,6 +37,13 @@ vi.mock('vue-i18n', () => ({
     },
     locale: { value: 'zh-CN' },
   }),
+  createI18n: () => ({
+    global: {
+      locale: { value: 'zh-CN' },
+      setLocaleMessage: vi.fn(),
+      t: (key: string) => key,
+    },
+  }),
 }))
 
 vi.mock('@/stores', () => ({
