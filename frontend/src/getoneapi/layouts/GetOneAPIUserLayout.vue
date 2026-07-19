@@ -5,7 +5,9 @@
     <div class="g1-user-frame">
       <UserHeader />
       <main id="g1-main" tabindex="-1">
-        <slot />
+        <div class="g1-user-content-inner">
+          <slot />
+        </div>
       </main>
     </div>
     <UserBottomNav class="lg:hidden" />
@@ -95,6 +97,10 @@ defineExpose({ replayTour })
 .g1-user-frame main {
   flex: 1;
   padding: 24px clamp(16px, 3vw, 40px);
+}
+
+.g1-user-content-inner {
+  max-width: 960px;
 }
 
 @media (min-width: 1024px) {

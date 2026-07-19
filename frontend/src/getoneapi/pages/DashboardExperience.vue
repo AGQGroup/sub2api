@@ -166,7 +166,7 @@ function formatTime(value?: string): string {
 
 .g1-dashboard__metrics-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 
@@ -174,7 +174,7 @@ function formatTime(value?: string): string {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 20px;
+  padding: 20px 24px;
   border: 1px solid var(--g1-divider);
   border-radius: var(--g1-radius-md);
   background: var(--g1-surface);
@@ -189,7 +189,7 @@ function formatTime(value?: string): string {
 }
 
 .g1-metric-card__value {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--g1-text);
   font-variant-numeric: tabular-nums;
@@ -197,7 +197,7 @@ function formatTime(value?: string): string {
 }
 
 .g1-metric-card__value--small {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
 }
 
@@ -221,7 +221,7 @@ function formatTime(value?: string): string {
 
 .g1-dashboard__grid {
   display: grid;
-  grid-template-columns: 1fr 280px;
+  grid-template-columns: 1fr 240px;
   gap: 24px;
   align-items: start;
 }
@@ -246,7 +246,7 @@ function formatTime(value?: string): string {
 .g1-quick-actions {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .g1-quick-action {
@@ -299,7 +299,7 @@ function formatTime(value?: string): string {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--g1-divider);
 }
 
@@ -360,14 +360,14 @@ function formatTime(value?: string): string {
 
 .g1-table th,
 .g1-table td {
-  padding: 12px 20px;
+  padding: 10px 20px;
   font-size: 13px;
   text-align: left;
   border-bottom: 1px solid var(--g1-divider);
 }
 
 .g1-table th {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -388,7 +388,7 @@ function formatTime(value?: string): string {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 180px;
+  max-width: 160px;
 }
 
 .g1-table tr:last-child td {
@@ -405,7 +405,7 @@ function formatTime(value?: string): string {
   }
 
   .g1-metric-card__value {
-    font-size: 24px;
+    font-size: 22px;
   }
 }
 </style>
