@@ -155,15 +155,14 @@ export async function installDeterministicMocks(
   settings = publicSettings,
 ): Promise<void> {
   await page.addInitScript(
-    ({ settings, theme }) => {
-      (window as any).__APP_CONFIG__ = settings
+    ({ theme }) => {
       localStorage.setItem('theme', theme)
       localStorage.setItem('sub2api_locale', 'en')
     },
-    { settings, theme: mode },
+    { theme: mode },
   )
 
-  await page.route('**/setup/status*', (route) =>
+  await page.route('**/api/v1/settings/public*', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -177,7 +176,7 @@ export async function installDeterministicMocks(
       body: JSON.stringify({ code: 0, data: settings }),
     }),
   )
-  await page.route('**/api/v1/catalog/public*', (route) =>
+  await page.route('**/catalog/public*', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -191,6 +190,12 @@ export async function installDeterministicMocks(
       body: JSON.stringify({ status: 'ok' }),
     }),
   )
+}
+
+export async function reapplyConfig(page: Page, settings = publicSettings): Promise<void> {
+  await page.evaluate((s) => {
+    window.__APP_CONFIG__ = s
+  }, settings)
 }
 
 export async function installAuthenticatedMocks(

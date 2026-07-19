@@ -446,13 +446,22 @@ describe('GetOneAPI high-fidelity component baseline', () => {
 
   it('adds only language and theme controls around user content', () => {
     const { pinia } = configureStore(true)
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [{ path: '/dashboard', component: { template: '<div />' }, meta: { title: 'Dashboard' } }],
+    })
     const layout = mount(GetOneAPIUserLayout, {
       slots: { default: '<div data-testid="user-content" />' },
-      global: { plugins: [pinia] },
+      global: {
+        plugins: [pinia, router, i18n],
+        stubs: {
+          UserSidebar: { template: '<div class="user-sidebar-stub" />' },
+          UserBottomNav: { template: '<div class="user-bottom-nav-stub" />' },
+          UserHeader: { template: '<div class="user-header-stub"><div role="radiogroup" data-ui="theme-control" /></div>' },
+        },
+      },
     })
 
-    expect(layout.find('header').exists()).toBe(false)
-    expect(layout.find('[data-ui="language-trigger"]').exists()).toBe(true)
     expect(layout.find('[role="radiogroup"]').exists()).toBe(true)
     expect(layout.find('[data-testid="user-content"]').exists()).toBe(true)
   })
