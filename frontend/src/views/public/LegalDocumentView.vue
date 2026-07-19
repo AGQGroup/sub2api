@@ -1,30 +1,5 @@
 <template>
-  <GetOneAPIPublicLayout v-if="appStore.getoneapiUserUIEnabled">
-    <DataState
-      v-if="loading"
-      state="loading"
-      :title="t('legal.loading')"
-    />
-    <DataState
-      v-else-if="loadError"
-      state="error"
-      :title="t('legal.loadFailed')"
-      :message="t('legal.retryLater')"
-      retryable
-      :retry-label="t('common.retry')"
-    />
-    <div v-else-if="!currentDocument">
-      <DataState
-        state="empty"
-        :title="t('legal.notFound')"
-      />
-    </div>
-    <div v-else>
-      <SectionHeader :title="currentDocument.title" />
-      <div v-html="renderedHtml" />
-    </div>
-  </GetOneAPIPublicLayout>
-  <div v-else class="min-h-screen bg-gray-50 text-gray-900 dark:bg-dark-950 dark:text-white">
+  <div class="min-h-screen bg-gray-50 text-gray-900 dark:bg-dark-950 dark:text-white">
     <header class="border-b border-gray-200 bg-white/95 dark:border-dark-800 dark:bg-dark-900/95">
       <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <RouterLink to="/home" class="flex min-w-0 items-center gap-3">
@@ -114,10 +89,6 @@ import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { useI18n } from 'vue-i18n'
-import { useAppStore } from '@/stores'
-import GetOneAPIPublicLayout from '@/getoneapi/layouts/GetOneAPIPublicLayout.vue'
-import DataState from '@/getoneapi/components/DataState.vue'
-import SectionHeader from '@/getoneapi/components/SectionHeader.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { getPublicSettings } from '@/api/auth'
 import { getLocale } from '@/i18n'
@@ -130,7 +101,6 @@ type LegalDocumentIcon = 'document' | 'shield' | 'globe' | 'cog'
 
 const route = useRoute()
 const { t } = useI18n()
-const appStore = useAppStore()
 const settings = ref<PublicSettings | null>(null)
 const loading = ref(true)
 const loadError = ref(false)

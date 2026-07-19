@@ -96,7 +96,7 @@
           <tr v-for="item in recentUsage" :key="item.id">
             <td class="truncate max-w-[140px]">{{ item.model || '—' }}</td>
             <td class="tabular-nums">{{ item.input_tokens + item.output_tokens }}</td>
-            <td class="tabular-nums">{{ formatCost(item.total_cost) }}</td>
+            <td class="tabular-nums">{{ formatCost(item.actual_cost) }}</td>
             <td class="tabular-nums">{{ formatTime(item.created_at) }}</td>
           </tr>
         </tbody>
@@ -128,12 +128,14 @@ const props = withDefaults(
     loadingCharts: boolean
     loadingUsage: boolean
     firstRequestFacts: FirstRequestFacts
+    healthStatus?: 'operational' | 'unknown'
   }>(),
   {
     platformQuotas: null,
     trend: null,
     models: null,
     recentUsage: null,
+    healthStatus: 'unknown',
   },
 )
 
@@ -149,13 +151,13 @@ const balanceText = computed(() => {
 })
 
 const healthClass = computed(() => {
-  if (!props.stats) return 'g1-health-dot--unknown'
-  return 'g1-health-dot--ok'
+  if (props.healthStatus === 'operational') return 'g1-health-dot--ok'
+  return 'g1-health-dot--unknown'
 })
 
 const healthLabel = computed(() => {
-  if (!props.stats) return t('getoneapi.dashboard.statusUnknown')
-  return t('getoneapi.dashboard.statusOperational')
+  if (props.healthStatus === 'operational') return t('getoneapi.dashboard.statusOperational')
+  return t('getoneapi.dashboard.statusUnknown')
 })
 
 function formatCost(value?: number): string {

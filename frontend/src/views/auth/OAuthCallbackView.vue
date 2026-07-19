@@ -1,33 +1,5 @@
 <template>
-  <GetOneAPIAuthLayout v-if="appStore.getoneapiUserUIEnabled">
-    <AuthStatePanel
-      v-if="isProcessing"
-      state="loading"
-      :title="t('auth.oauth.callbackTitle')"
-      :description="t('auth.oauth.callbackHint')"
-    />
-    <AuthStatePanel
-      v-else-if="needsRegistrationCompletion"
-      state="warning"
-      :title="t('auth.oidc.callbackTitle', { providerName })"
-      :description="registrationHint"
-    />
-    <AuthStatePanel
-      v-else-if="invalidCallback"
-      state="error"
-      :title="t('auth.oauth.invalidCallbackTitle')"
-      :description="t('auth.oauth.invalidCallbackHint')"
-      :retry-label="t('auth.backToLogin')"
-      back-href="/login"
-    />
-    <AuthStatePanel
-      v-else
-      state="loading"
-      :title="t('auth.oauth.callbackTitle')"
-      :description="t('auth.oauth.callbackHint')"
-    />
-  </GetOneAPIAuthLayout>
-  <div v-else class="min-h-screen bg-gray-50 px-4 py-10 dark:bg-dark-900">
+  <div class="min-h-screen bg-gray-50 px-4 py-10 dark:bg-dark-900">
     <div class="mx-auto max-w-2xl">
       <div v-if="isProcessing" class="card p-6 text-center">
         <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"></div>
@@ -180,8 +152,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useClipboard } from '@/composables/useClipboard'
 import { useAppStore, useAuthStore } from '@/stores'
 import { apiClient } from '@/api/client'
-import GetOneAPIAuthLayout from '@/getoneapi/layouts/GetOneAPIAuthLayout.vue'
-import AuthStatePanel from '@/getoneapi/components/auth/AuthStatePanel.vue'
 import { buildApiUrl } from '@/api/url'
 import {
   exchangePendingOAuthCompletion,

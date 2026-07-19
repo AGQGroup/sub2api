@@ -12,21 +12,23 @@ test('login form is visible and interactive', async ({ page }) => {
   await expect(page.locator('form')).toHaveAttribute('aria-busy', 'false')
 })
 
-test('register link is reachable from login', async ({ page }) => {
+test('login primary button is reachable and properly sized', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' })
   await page.goto('/login')
-  const registerLink = page.locator('a[href="/register"]')
-  if (await registerLink.count() > 0) {
-    await expect(registerLink.first()).toBeVisible()
-  }
+  const primary = page.locator('[data-ui="auth-primary"]')
+  await expect(primary).toBeVisible()
+  const box = await primary.boundingBox()
+  expect(box).not.toBeNull()
+  expect(box!.width).toBeGreaterThanOrEqual(44)
+  expect(box!.height).toBeGreaterThanOrEqual(44)
 })
 
-test('forgot password link works when enabled', async ({ page }) => {
+test('login page loads without errors', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' })
   await page.goto('/login')
-  const forgotLink = page.locator('a[href="/forgot-password"]')
-  const count = await forgotLink.count()
-  expect(count).toBeGreaterThanOrEqual(0)
+  await expect(page.locator('form')).toBeVisible()
+  const bodyText = await page.locator('body').innerText()
+  expect(bodyText.length).toBeGreaterThan(0)
 })

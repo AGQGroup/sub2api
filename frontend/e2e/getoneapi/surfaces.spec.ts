@@ -44,6 +44,7 @@ for (const viewport of viewports) {
       await page.emulateMedia({ colorScheme: mode, reducedMotion: 'reduce' })
       await page.goto('/home')
       await expect(page.locator('[data-surface^="getoneapi-"]')).toBeVisible({ timeout: 10000 })
+      await assertSurfaceInvariants(page, 'getoneapi-public')
     })
 
     test(`/login ${viewport.name} ${mode}`, async ({ page }) => {
@@ -52,6 +53,7 @@ for (const viewport of viewports) {
       await page.goto('/login')
       await expect(page.locator('[data-surface^="getoneapi-"]')).toBeVisible({ timeout: 10000 })
       await expect(page.locator('form')).toBeVisible()
+      await assertSurfaceInvariants(page, 'getoneapi-auth')
     })
   }
 }

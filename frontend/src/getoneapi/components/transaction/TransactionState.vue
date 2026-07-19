@@ -37,7 +37,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Icon from '@/components/icons/Icon.vue'
+
+const { t } = useI18n()
 
 export type TransactionStateValue =
   | 'creating'
@@ -65,26 +68,26 @@ const isProcessing = computed(
 
 const titleText = computed(() => {
   const titles: Record<TransactionStateValue, string> = {
-    creating: 'Creating order',
-    'awaiting-payment': 'Awaiting payment',
-    processing: 'Processing payment',
-    succeeded: 'Payment successful',
-    failed: 'Payment failed',
-    cancelled: 'Payment cancelled',
-    expired: 'Payment expired',
+    creating: t('getoneapi.transaction.creating'),
+    'awaiting-payment': t('getoneapi.transaction.awaitingPayment'),
+    processing: t('getoneapi.transaction.processing'),
+    succeeded: t('getoneapi.transaction.succeeded'),
+    failed: t('getoneapi.transaction.failed'),
+    cancelled: t('getoneapi.transaction.cancelled'),
+    expired: t('getoneapi.transaction.expired'),
   }
   return titles[props.state]
 })
 
 const stateDescription = computed(() => {
   const descriptions: Record<TransactionStateValue, string> = {
-    creating: 'Your order is being created.',
-    'awaiting-payment': 'Please complete your payment.',
-    processing: 'Your payment is being verified.',
+    creating: t('getoneapi.transaction.creatingDesc'),
+    'awaiting-payment': t('getoneapi.transaction.awaitingPaymentDesc'),
+    processing: t('getoneapi.transaction.processingDesc'),
     succeeded: '',
-    failed: 'The payment was not completed.',
-    cancelled: 'This order has been cancelled.',
-    expired: 'This order has expired.',
+    failed: t('getoneapi.transaction.failedDesc'),
+    cancelled: t('getoneapi.transaction.cancelledDesc'),
+    expired: t('getoneapi.transaction.expiredDesc'),
   }
   return descriptions[props.state]
 })

@@ -11,7 +11,8 @@
       :loading="loading"
       :loading-charts="loadingCharts"
       :loading-usage="loadingUsage"
-      :first-request-facts="{ keyCount: stats?.total_api_keys ?? 0, configurationOpened: false, totalRequests: stats?.total_requests ?? 0 }"
+      :health-status="healthStatus"
+      :first-request-facts="{ keyCount: stats?.total_api_keys ?? 0, configurationOpened: configOpened, totalRequests: stats?.total_requests ?? 0 }"
       @create-key="$router.push('/keys')"
       @refresh="refreshAll"
       @range-change="loadCharts"
@@ -44,6 +45,7 @@ import UserDashboardCharts from '@/components/user/dashboard/UserDashboardCharts
 import UserDashboardRecentUsage from '@/components/user/dashboard/UserDashboardRecentUsage.vue'
 import UserDashboardQuickActions from '@/components/user/dashboard/UserDashboardQuickActions.vue'
 import DashboardExperience from '@/getoneapi/pages/DashboardExperience.vue'
+import { getPublicHealth } from '@/getoneapi/public/health'
 import type { UsageLog, TrendDataPoint, ModelStat, PlatformQuotaItem } from '@/types'
 import { getMyPlatformQuotas } from '@/api/user'
 import { formatDateLocalInput } from '@/utils/format'
@@ -59,6 +61,8 @@ const trendData = ref<TrendDataPoint[]>([])
 const modelStats = ref<ModelStat[]>([])
 const recentUsage = ref<UsageLog[]>([])
 const platformQuotas = ref<PlatformQuotaItem[] | null>(null)
+const configOpened = ref(false)
+const healthStatus = ref<'operational' | 'unknown'>('unknown')
 
 const startDate = ref(formatDateLocalInput(new Date(Date.now() - 6 * 86400000)))
 const endDate = ref(formatDateLocalInput(new Date()))
@@ -70,5 +74,9 @@ const loadRecent = async () => { loadingUsage.value = true; try { const res = aw
 const loadPlatformQuotas = async () => { try { const data = await getMyPlatformQuotas(); platformQuotas.value = data.platform_quotas ?? [] } catch (error) { console.warn('Failed to load platform quotas:', error); platformQuotas.value = [] } }
 const refreshAll = () => { loadStats(); loadCharts(); loadRecent(); loadPlatformQuotas() }
 
-onMounted(() => { refreshAll() })
+async function checkHealth() {
+  if (!appStore.getoneapiUserUIEnabled) return
+  healthStatus.value = await getPublicHealth()
+}
+onMounted(() => { refreshAll(); checkHealth(); configOpened.value = localStorage.getItem('getoneapi_config_opened') === 'true' })
 </script>

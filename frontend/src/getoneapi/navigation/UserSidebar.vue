@@ -37,7 +37,7 @@
 
       <p class="g1-sidebar__section-label">{{ t('getoneapi.nav.finance') }}</p>
       <ul class="g1-sidebar__list">
-        <li v-for="item in secondaryNavigation" :key="item.path">
+        <li v-for="item in visibleSecondaryNav" :key="item.path">
           <router-link
             :to="item.path"
             class="g1-sidebar__link"
@@ -54,7 +54,7 @@
 
       <p class="g1-sidebar__section-label">{{ t('getoneapi.nav.tools') }}</p>
       <ul class="g1-sidebar__list">
-        <li v-for="item in utilityNavigation" :key="item.path">
+        <li v-for="item in visibleUtilityNav" :key="item.path">
           <router-link
             :to="item.path"
             class="g1-sidebar__link"
@@ -93,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAppStore, useAuthStore } from '@/stores'
@@ -104,6 +105,24 @@ const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
 const authStore = useAuthStore()
+
+const visibleSecondaryNav = computed(() =>
+  secondaryNavigation.filter((item) => {
+    if (item.path === '/purchase' || item.path === '/subscriptions') {
+      return appStore.cachedPublicSettings?.payment_enabled !== false
+    }
+    if (item.path === '/redeem') return !authStore.isSimpleMode
+    if (item.path === '/affiliate') return appStore.cachedPublicSettings?.affiliate_enabled !== false
+    return true
+  }),
+)
+
+const visibleUtilityNav = computed(() =>
+  utilityNavigation.filter((item) => {
+    if (item.path === '/batch-image') return true
+    return true
+  }),
+)
 
 function isActive(path: string): boolean {
   if (path === '/dashboard') return route.path === '/dashboard'

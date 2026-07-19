@@ -24,8 +24,11 @@ const { t } = useI18n()
 const route = useRoute()
 
 const pageTitle = computed(() => {
+  const titleKey = route.meta.titleKey as string | undefined
+  if (titleKey) return t(titleKey)
   const title = route.meta.title as string | undefined
-  return title || t('common.appName')
+  if (title) return title
+  return t('common.appName')
 })
 </script>
 
@@ -38,25 +41,26 @@ const pageTitle = computed(() => {
   min-height: 64px;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 0 clamp(16px, 3vw, 40px);
+  gap: 8px;
+  padding: 0 clamp(12px, 3vw, 40px);
   border-bottom: 1px solid var(--g1-divider);
   background: var(--g1-surface);
 }
 
 .g1-user-header__left {
-  width: 100px;
+  display: none;
 }
 
 .g1-user-header__center {
   flex: 1;
+  min-width: 0;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .g1-user-header__title {
   margin: 0;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--g1-text);
   overflow: hidden;
@@ -67,8 +71,21 @@ const pageTitle = computed(() => {
 .g1-user-header__right {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-width: 100px;
-  justify-content: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+  .g1-user-header__center {
+    justify-content: center;
+  }
+  .g1-user-header__left {
+    display: block;
+    width: 100px;
+  }
+  .g1-user-header__right {
+    min-width: 100px;
+    justify-content: flex-end;
+  }
 }
 </style>

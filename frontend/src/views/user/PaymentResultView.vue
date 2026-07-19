@@ -1,12 +1,22 @@
 <template>
   <GetOneAPIUserLayout v-if="appStore.getoneapiUserUIEnabled">
     <TransactionState
-      v-if="loading || isPending"
-      :state="isPending ? 'processing' : 'creating'"
+      v-if="loading"
+      state="creating"
+    />
+    <TransactionState
+      v-else-if="isPending"
+      state="processing"
+      :amount="(order as any)?.pay_amount ?? (order as any)?.amount"
+      :currency="(order as any)?.currency"
+      :order-id="(order as any)?.id ? String((order as any).id) : (order as any)?.out_trade_no"
     />
     <TransactionState
       v-else-if="isSuccess"
       state="succeeded"
+      :amount="(order as any)?.pay_amount ?? (order as any)?.amount"
+      :currency="(order as any)?.currency"
+      :order-id="(order as any)?.id ? String((order as any).id) : (order as any)?.out_trade_no"
     >
       <router-link to="/dashboard" data-variant="primary">
         {{ t('payment.result.backToDashboard') }}
@@ -15,6 +25,9 @@
     <TransactionState
       v-else
       state="failed"
+      :amount="(order as any)?.pay_amount ?? (order as any)?.amount"
+      :currency="(order as any)?.currency"
+      :order-id="(order as any)?.id ? String((order as any).id) : (order as any)?.out_trade_no"
       retryable
     >
       <router-link to="/purchase" data-variant="primary">

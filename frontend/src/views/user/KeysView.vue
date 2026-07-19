@@ -1548,6 +1548,11 @@ const openUseKeyModal = (key: ApiKey) => {
   selectedKey.value = key
   showUseKeyModal.value = true
   configurationOpened.value = true
+  try {
+    localStorage.setItem('getoneapi_config_opened', 'true')
+  } catch {
+    /* localStorage unavailable */
+  }
 }
 
 const closeUseKeyModal = () => {
