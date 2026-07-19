@@ -101,6 +101,7 @@ defineExpose({ replayTour })
 
 .g1-user-content-inner {
   max-width: 960px;
+  margin: 0 auto;
 }
 
 @media (min-width: 1024px) {
