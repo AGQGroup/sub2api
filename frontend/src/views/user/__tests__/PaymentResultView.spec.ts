@@ -36,6 +36,17 @@ vi.mock('@/stores/payment', () => ({
   }),
 }))
 
+const getoneapiUserUIEnabled = vi.hoisted(() => vi.fn(() => false))
+vi.mock('@/stores', () => ({
+  useAppStore: () => ({
+    getoneapiUserUIEnabled: getoneapiUserUIEnabled(),
+  }),
+  useAuthStore: () => ({
+    user: null,
+    isAdmin: false,
+  }),
+}))
+
 vi.mock('@/api/payment', () => ({
   paymentAPI: {
     verifyOrder,
@@ -131,6 +142,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -182,6 +196,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -217,6 +234,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -258,6 +278,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -289,6 +312,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -314,6 +340,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -341,6 +370,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -373,6 +405,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -397,6 +432,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -438,6 +476,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -466,6 +507,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })
@@ -490,6 +534,9 @@ describe('PaymentResultView', () => {
       global: {
         stubs: {
           OrderStatusBadge: true,
+          GetOneAPIUserLayout: { template: '<div data-testid="g1-user-layout"><slot /></div>' },
+          TransactionState: { template: '<div data-testid="transaction-state"><slot /></div>' },
+          routerLink: true,
         },
       },
     })

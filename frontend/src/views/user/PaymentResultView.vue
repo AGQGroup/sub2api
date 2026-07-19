@@ -1,5 +1,28 @@
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-dark-900">
+  <GetOneAPIUserLayout v-if="appStore.getoneapiUserUIEnabled">
+    <TransactionState
+      v-if="loading || isPending"
+      :state="isPending ? 'processing' : 'creating'"
+    />
+    <TransactionState
+      v-else-if="isSuccess"
+      state="succeeded"
+    >
+      <router-link to="/dashboard" data-variant="primary">
+        {{ t('payment.result.backToDashboard') }}
+      </router-link>
+    </TransactionState>
+    <TransactionState
+      v-else
+      state="failed"
+      retryable
+    >
+      <router-link to="/purchase" data-variant="primary">
+        {{ t('payment.result.backToRecharge') }}
+      </router-link>
+    </TransactionState>
+  </GetOneAPIUserLayout>
+  <div v-else class="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-dark-900">
     <div class="w-full max-w-md space-y-6">
       <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-20">
@@ -112,12 +135,16 @@ import type { PublicOrderVerifyResult } from '@/api/payment'
 import type { OrderStatus, PaymentOrder } from '@/types/payment'
 import { formatPaymentAmount, normalizePaymentCurrency } from '@/components/payment/currency'
 import { normalizePaymentMethodForDisplay, paymentMethodI18nKey } from './paymentUx'
+import { useAppStore } from '@/stores'
+import GetOneAPIUserLayout from '@/getoneapi/layouts/GetOneAPIUserLayout.vue'
+import TransactionState from '@/getoneapi/components/transaction/TransactionState.vue'
 
 const i18n = useI18n()
 const { t } = i18n
 const route = useRoute()
 const router = useRouter()
 const paymentStore = usePaymentStore()
+const appStore = useAppStore()
 
 type ResolvedOrder = PaymentOrder | PublicOrderVerifyResult
 
