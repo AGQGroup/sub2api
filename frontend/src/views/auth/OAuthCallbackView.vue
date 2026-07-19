@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50 px-4 py-10 dark:bg-dark-900">
+  <component :is="authLayoutWrapper" v-bind="authLayoutProps">
+    <div v-if="authLayoutWrapper === 'div'" class="min-h-screen bg-gray-50 px-4 py-10 dark:bg-dark-900">
     <div class="mx-auto max-w-2xl">
       <div v-if="isProcessing" class="card p-6 text-center">
         <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"></div>
@@ -142,7 +143,8 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -152,6 +154,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useClipboard } from '@/composables/useClipboard'
 import { useAppStore, useAuthStore } from '@/stores'
 import { apiClient } from '@/api/client'
+import GetOneAPIAuthLayout from '@/getoneapi/layouts/GetOneAPIAuthLayout.vue'
 import { buildApiUrl } from '@/api/url'
 import {
   exchangePendingOAuthCompletion,
@@ -171,6 +174,16 @@ const { copyToClipboard } = useClipboard()
 const appStore = useAppStore()
 const authStore = useAuthStore()
 const isProcessing = ref(false)
+
+const authLayoutWrapper = computed(() =>
+  appStore.getoneapiUserUIEnabled ? GetOneAPIAuthLayout : 'div',
+)
+
+const authLayoutProps = computed(() =>
+  authLayoutWrapper.value === 'div'
+    ? { class: '' }
+    : {},
+)
 const isSubmitting = ref(false)
 const needsRegistrationCompletion = ref(false)
 const invitationRequired = ref(false)

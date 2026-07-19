@@ -1,6 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50 text-gray-900 dark:bg-dark-950 dark:text-white">
-    <header class="border-b border-gray-200 bg-white/95 dark:border-dark-800 dark:bg-dark-900/95">
+  <component :is="legalLayoutWrapper" v-bind="legalLayoutProps">
+    <div v-if="legalLayoutWrapper === 'div'" class="min-h-screen bg-gray-50 text-gray-900 dark:bg-dark-950 dark:text-white">
+    <header v-if="legalLayoutWrapper === 'div'" class="border-b border-gray-200 bg-white/95 dark:border-dark-800 dark:bg-dark-900/95">
       <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <RouterLink to="/home" class="flex min-w-0 items-center gap-3">
           <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200 dark:bg-dark-800 dark:ring-dark-700">
@@ -80,7 +81,8 @@
         </div>
       </article>
     </main>
-  </div>
+    </div>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -90,6 +92,8 @@ import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/components/icons/Icon.vue'
+import { useAppStore } from '@/stores'
+import GetOneAPIPublicLayout from '@/getoneapi/layouts/GetOneAPIPublicLayout.vue'
 import { getPublicSettings } from '@/api/auth'
 import { getLocale } from '@/i18n'
 import { sanitizeUrl } from '@/utils/url'
@@ -101,9 +105,20 @@ type LegalDocumentIcon = 'document' | 'shield' | 'globe' | 'cog'
 
 const route = useRoute()
 const { t } = useI18n()
+const appStore = useAppStore()
 const settings = ref<PublicSettings | null>(null)
 const loading = ref(true)
 const loadError = ref(false)
+
+const legalLayoutWrapper = computed(() =>
+  appStore.getoneapiUserUIEnabled ? GetOneAPIPublicLayout : 'div',
+)
+
+const legalLayoutProps = computed(() =>
+  legalLayoutWrapper.value === 'div'
+    ? { class: 'min-h-screen bg-gray-50 text-gray-900 dark:bg-dark-950 dark:text-white' }
+    : {},
+)
 
 marked.setOptions({
   breaks: true,

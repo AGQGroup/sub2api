@@ -117,7 +117,8 @@ const steps = computed(() => resolveFirstRequestProgress(props.facts))
 
 .g1-checklist__link {
   display: inline-flex;
-  min-height: 32px;
+  min-height: 44px;
+  min-width: 44px;
   align-items: center;
   padding: 0 12px;
   border-radius: var(--g1-radius-sm);

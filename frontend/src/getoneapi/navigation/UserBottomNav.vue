@@ -5,7 +5,7 @@
     aria-label="Mobile navigation"
     :style="{ paddingBottom: `calc(8px + env(safe-area-inset-bottom, 0px))` }"
   >
-    <template v-for="item in coreUserNavigation" :key="item.path">
+    <template v-for="item in visibleNav" :key="item.path">
       <router-link
         :to="item.path"
         class="g1-bottom-nav__link"
@@ -22,13 +22,25 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useAppStore } from '@/stores'
 import Icon from '@/components/icons/Icon.vue'
 import { coreUserNavigation } from './items'
 
 const { t } = useI18n()
 const route = useRoute()
+const appStore = useAppStore()
+
+const visibleNav = computed(() =>
+  coreUserNavigation.filter((item) => {
+    if (item.path === '/available-channels') {
+      return appStore.cachedPublicSettings?.available_channels_enabled !== false
+    }
+    return true
+  }),
+)
 
 function isActive(path: string): boolean {
   if (path === '/dashboard') return route.path === '/dashboard'

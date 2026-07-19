@@ -12,3 +12,5 @@ dist/
 # 忽略缓存
 .cache/
 .vite/
+playwright-report/
+test-results/

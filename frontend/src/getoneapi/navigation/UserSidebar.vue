@@ -108,18 +108,26 @@ const authStore = useAuthStore()
 
 const visibleSecondaryNav = computed(() =>
   secondaryNavigation.filter((item) => {
-    if (item.path === '/purchase' || item.path === '/subscriptions') {
+    if (item.path === '/purchase' || item.path === '/subscriptions' || item.path === '/orders') {
       return appStore.cachedPublicSettings?.payment_enabled !== false
     }
     if (item.path === '/redeem') return !authStore.isSimpleMode
-    if (item.path === '/affiliate') return appStore.cachedPublicSettings?.affiliate_enabled !== false
+    if (item.path === '/affiliate') return (
+      appStore.cachedPublicSettings?.affiliate_enabled !== false && !authStore.isSimpleMode
+    )
     return true
   }),
 )
 
 const visibleUtilityNav = computed(() =>
   utilityNavigation.filter((item) => {
+    if (item.path === '/monitor') {
+      return appStore.cachedPublicSettings?.channel_monitor_enabled !== false
+    }
     if (item.path === '/batch-image') return true
+    if (item.path === '/orders') {
+      return appStore.cachedPublicSettings?.payment_enabled !== false
+    }
     return true
   }),
 )
@@ -157,9 +165,9 @@ async function handleLogout(): Promise<void> {
 
 .g1-sidebar__logo {
   display: flex;
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   align-items: center;
   justify-content: center;
   border-radius: var(--g1-radius-sm);

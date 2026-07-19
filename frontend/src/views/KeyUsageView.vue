@@ -1,7 +1,9 @@
 <template>
-  <div class="relative flex min-h-screen flex-col bg-gray-50 dark:bg-dark-950">
-    <!-- Header (same pattern as HomeView) -->
-    <header class="relative z-20 px-6 py-4">
+  <component :is="layoutWrapper" v-bind="layoutProps">
+    <template v-if="layoutWrapper === GetOneAPIPublicLayout">
+      <SectionHeader :title="t('home.keyUsageTitle')" :description="t('home.keyUsageDesc')" />
+    </template>
+    <header :class="{ 'relative z-20 px-6 py-4': true, hidden: layoutWrapper === GetOneAPIPublicLayout }">
       <nav class="mx-auto flex max-w-6xl items-center justify-between">
         <router-link to="/home" class="flex items-center gap-3">
           <div class="h-10 w-10 overflow-hidden rounded-xl shadow-md">
@@ -413,7 +415,7 @@
         </div>
       </div>
     </footer>
-  </div>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -422,12 +424,24 @@ import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import Icon from '@/components/icons/Icon.vue'
+import GetOneAPIPublicLayout from '@/getoneapi/layouts/GetOneAPIPublicLayout.vue'
+import SectionHeader from '@/getoneapi/components/SectionHeader.vue'
 import { buildGatewayUrl } from '@/api/client'
 import { formatDateLocalInput } from '@/utils/format'
 import { sanitizeUrl } from '@/utils/url'
 
 const { t, locale } = useI18n()
 const appStore = useAppStore()
+
+const layoutWrapper = computed(() =>
+  appStore.getoneapiUserUIEnabled ? GetOneAPIPublicLayout : 'div',
+)
+
+const layoutProps = computed(() =>
+  layoutWrapper.value === 'div'
+    ? { class: 'relative flex min-h-screen flex-col bg-gray-50 dark:bg-dark-950' }
+    : {},
+)
 
 // ==================== Site Settings (same as HomeView) ====================
 
