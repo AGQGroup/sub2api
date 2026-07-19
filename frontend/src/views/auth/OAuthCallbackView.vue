@@ -1,6 +1,5 @@
 <template>
   <component :is="authLayoutWrapper" v-bind="authLayoutProps">
-    <div v-if="authLayoutWrapper === 'div'" class="min-h-screen bg-gray-50 px-4 py-10 dark:bg-dark-900">
     <div class="mx-auto max-w-2xl">
       <div v-if="isProcessing" class="card p-6 text-center">
         <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"></div>
@@ -143,7 +142,6 @@
         </div>
       </div>
     </div>
-    </div>
   </component>
 </template>
 
@@ -181,7 +179,7 @@ const authLayoutWrapper = computed(() =>
 
 const authLayoutProps = computed(() =>
   authLayoutWrapper.value === 'div'
-    ? { class: '' }
+    ? { class: 'min-h-screen bg-gray-50 px-4 py-10 dark:bg-dark-900' }
     : {},
 )
 const isSubmitting = ref(false)

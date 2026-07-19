@@ -147,11 +147,16 @@ async function installDeterministicMocks(
   mode: 'light' | 'dark',
   settings = publicSettings
 ): Promise<void> {
-  await page.addInitScript(({ settings, theme }) => {
-    window.__APP_CONFIG__ = settings
+  await page.addInitScript(({ s, theme }) => {
+    Object.defineProperty(window, '__APP_CONFIG__', {
+      get() { return s },
+      set(_v) {},
+      enumerable: true,
+      configurable: true,
+    })
     localStorage.setItem('theme', theme)
     localStorage.setItem('sub2api_locale', 'en')
-  }, { settings, theme: mode })
+  }, { s: settings, theme: mode })
 
   await page.route('**/setup/status*', (route) => route.fulfill({
     status: 200,

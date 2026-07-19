@@ -1,8 +1,5 @@
 <template>
   <component :is="layoutWrapper" v-bind="layoutProps">
-    <template v-if="layoutWrapper === GetOneAPIPublicLayout">
-      <SectionHeader :title="t('home.keyUsageTitle')" :description="t('home.keyUsageDesc')" />
-    </template>
     <header :class="{ 'relative z-20 px-6 py-4': true, hidden: layoutWrapper === GetOneAPIPublicLayout }">
       <nav class="mx-auto flex max-w-6xl items-center justify-between">
         <router-link to="/home" class="flex items-center gap-3">
@@ -60,11 +57,13 @@
               v-model="apiKey"
               :type="keyVisible ? 'text' : 'password'"
               :placeholder="t('keyUsage.placeholder')"
+              aria-label="API Key"
               class="input-ring w-full h-12 pl-12 pr-12 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition-all dark:border-dark-700 dark:bg-dark-900 dark:text-white dark:placeholder:text-dark-500"
               @keydown.enter="queryKey"
             />
             <button
               @click="keyVisible = !keyVisible"
+              :aria-label="keyVisible ? 'Hide API Key' : 'Show API Key'"
               class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:text-dark-500 dark:hover:text-white transition-colors"
             >
               <svg v-if="!keyVisible" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -425,7 +424,6 @@ import { useAppStore } from '@/stores'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import Icon from '@/components/icons/Icon.vue'
 import GetOneAPIPublicLayout from '@/getoneapi/layouts/GetOneAPIPublicLayout.vue'
-import SectionHeader from '@/getoneapi/components/SectionHeader.vue'
 import { buildGatewayUrl } from '@/api/client'
 import { formatDateLocalInput } from '@/utils/format'
 import { sanitizeUrl } from '@/utils/url'
