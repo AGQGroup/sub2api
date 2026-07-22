@@ -2,7 +2,10 @@
    Every selector is scoped under [data-surface^='getoneapi-'] so admin and
    legacy pages are completely unaffected. */
 
-[data-surface^='getoneapi-'] button,
+/* Only enforce the generic control appearance on unstyled buttons and
+   explicit GetOneAPI variants. Component-scoped controls (theme toggle,
+   segmented tabs, icon buttons with Tailwind classes) keep their own look. */
+[data-surface^='getoneapi-'] button:not([class]),
 [data-surface^='getoneapi-'] .btn {
   min-height: 44px;
   padding: 0 16px;
@@ -40,7 +43,7 @@
   color: var(--g1-link-hover);
 }
 
-[data-surface^='getoneapi-'] button:hover,
+[data-surface^='getoneapi-'] button:not([class]):hover,
 [data-surface^='getoneapi-'] .btn:hover {
   background: var(--g1-divider);
 }
