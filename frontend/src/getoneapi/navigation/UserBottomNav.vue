@@ -74,7 +74,7 @@ function isActive(path: string): boolean {
   padding: 6px 4px;
   color: var(--g1-text-tertiary);
   text-decoration: none;
-  transition: color 120ms ease;
+  transition: color var(--g1-duration-fast) var(--g1-ease);
 }
 
 .g1-bottom-nav__link--active {

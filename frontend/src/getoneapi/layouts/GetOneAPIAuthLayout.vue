@@ -102,7 +102,7 @@ const links = computed(() => getPublicLinks({
 
 .g1-auth-eyebrow {
   color: var(--g1-primary);
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -111,7 +111,7 @@ const links = computed(() => getPublicLinks({
 .g1-auth-facts h1 {
   margin-top: 12px;
   overflow-wrap: anywhere;
-  font-size: 56px;
+  font-size: var(--g1-text-hero);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.05;
@@ -121,7 +121,7 @@ const links = computed(() => getPublicLinks({
   max-width: 54ch;
   margin-top: 16px;
   color: var(--g1-text-secondary);
-  font-size: 17px;
+  font-size: var(--g1-text-md);
   line-height: 1.65;
 }
 
@@ -143,7 +143,7 @@ const links = computed(() => getPublicLinks({
 
 .g1-auth-facts dt {
   color: var(--g1-text-tertiary);
-  font-size: 12px;
+  font-size: var(--g1-text-xs);
 }
 
 .g1-auth-facts dd {
@@ -224,7 +224,7 @@ const links = computed(() => getPublicLinks({
       'authentication'
       'catalog';
     grid-template-columns: minmax(0, 1fr);
-    gap: 32px;
+    gap: var(--g1-space-8);
     padding: 28px 16px 48px;
   }
 

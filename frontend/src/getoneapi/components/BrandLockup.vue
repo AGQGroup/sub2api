@@ -42,7 +42,7 @@ function useFallbackLogo(): void {
   display: inline-flex;
   min-width: 0;
   align-items: center;
-  gap: 12px;
+  gap: var(--g1-space-3);
   color: var(--g1-text);
   text-decoration: none;
 }
@@ -59,7 +59,7 @@ function useFallbackLogo(): void {
 
 .g1-brand__name {
   overflow-wrap: anywhere;
-  font-size: 20px;
+  font-size: var(--g1-text-lg);
   font-weight: 650;
   line-height: 1.2;
 }

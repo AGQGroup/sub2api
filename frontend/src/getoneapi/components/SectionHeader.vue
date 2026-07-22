@@ -27,7 +27,7 @@ defineProps<{
 
 .g1-section-header__title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--g1-text-lg);
   font-weight: 700;
   color: var(--g1-text);
 }
@@ -43,6 +43,6 @@ defineProps<{
 .g1-section-header__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--g1-space-2);
 }
 </style>

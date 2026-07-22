@@ -170,25 +170,25 @@ function formatTime(value?: string): string {
 .g1-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--g1-space-6);
 }
 
 .g1-dashboard__metrics-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: var(--g1-space-3);
 }
 
 .g1-metric-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--g1-space-2);
   padding: 20px 24px;
   border: 1px solid var(--g1-divider);
   border-radius: var(--g1-radius-md);
   background: var(--g1-surface);
   box-shadow: var(--g1-shadow-raised);
-  transition: box-shadow 150ms ease;
+  transition: box-shadow var(--g1-duration) var(--g1-ease);
 }
 
 .g1-metric-card:hover {
@@ -226,7 +226,7 @@ function formatTime(value?: string): string {
 }
 
 .g1-metric-card__label {
-  font-size: 12px;
+  font-size: var(--g1-text-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -234,7 +234,7 @@ function formatTime(value?: string): string {
 }
 
 .g1-metric-card__value {
-  font-size: 28px;
+  font-size: var(--g1-text-xl);
   font-weight: 700;
   color: var(--g1-text);
   font-variant-numeric: tabular-nums;
@@ -267,7 +267,7 @@ function formatTime(value?: string): string {
 .g1-dashboard__grid {
   display: grid;
   grid-template-columns: 1fr 240px;
-  gap: 24px;
+  gap: var(--g1-space-6);
   align-items: start;
 }
 
@@ -278,12 +278,12 @@ function formatTime(value?: string): string {
 .g1-dashboard__side {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--g1-space-3);
 }
 
 .g1-section-title {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--g1-text-base);
   font-weight: 700;
   color: var(--g1-text);
 }
@@ -298,7 +298,7 @@ function formatTime(value?: string): string {
   display: flex;
   min-height: 44px;
   align-items: center;
-  gap: 12px;
+  gap: var(--g1-space-3);
   padding: 0 12px;
   border-radius: var(--g1-radius-md);
   color: var(--g1-text);
@@ -308,7 +308,7 @@ function formatTime(value?: string): string {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background-color 120ms ease;
+  transition: background-color var(--g1-duration-fast) var(--g1-ease);
 }
 
 .g1-quick-action:hover {
@@ -359,7 +359,7 @@ function formatTime(value?: string): string {
   border: none;
   background: transparent;
   color: var(--g1-link);
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-weight: 600;
   cursor: pointer;
 }
@@ -388,7 +388,7 @@ function formatTime(value?: string): string {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: var(--g1-space-3);
   padding: 48px 24px;
   color: var(--g1-text-tertiary);
 }
@@ -407,7 +407,7 @@ function formatTime(value?: string): string {
 .g1-table th,
 .g1-table td {
   padding: 10px 20px;
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   text-align: left;
   border-bottom: 1px solid var(--g1-divider);
 }
@@ -438,7 +438,7 @@ function formatTime(value?: string): string {
 }
 
 .g1-table tbody tr {
-  transition: background-color 100ms ease;
+  transition: background-color var(--g1-duration-fast) var(--g1-ease);
 }
 
 .g1-table tbody tr:hover {

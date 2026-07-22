@@ -135,7 +135,7 @@ onBeforeUnmount(() => document.removeEventListener('click', closeOnOutsideClick)
 .g1-language__option {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--g1-space-2);
   white-space: nowrap;
 }
 
@@ -152,7 +152,7 @@ onBeforeUnmount(() => document.removeEventListener('click', closeOnOutsideClick)
   top: calc(100% + 6px);
   right: 0;
   width: 176px;
-  padding: 4px;
+  padding: var(--g1-space-1);
   border: 1px solid var(--g1-divider);
   border-radius: var(--g1-radius-md);
   background: var(--g1-surface-raised);

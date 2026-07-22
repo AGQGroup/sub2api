@@ -41,7 +41,7 @@ const pageTitle = computed(() => {
   min-height: 64px;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--g1-space-2);
   padding: 0 clamp(12px, 3vw, 40px);
   border-bottom: 1px solid var(--g1-divider);
   background: var(--g1-surface);
@@ -60,7 +60,7 @@ const pageTitle = computed(() => {
 
 .g1-user-header__title {
   margin: 0;
-  font-size: 17px;
+  font-size: var(--g1-text-md);
   font-weight: 700;
   color: var(--g1-text);
   overflow: hidden;
@@ -71,7 +71,7 @@ const pageTitle = computed(() => {
 .g1-user-header__right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--g1-space-1);
   flex-shrink: 0;
 }
 

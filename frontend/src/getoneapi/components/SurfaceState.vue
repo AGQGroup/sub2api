@@ -63,14 +63,14 @@ defineEmits<{ retry: [] }>()
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: var(--g1-space-3);
   margin-top: 16px;
 }
 
 .g1-surface-state__actions button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--g1-space-2);
 }
 
 .g1-surface-state__skeleton {

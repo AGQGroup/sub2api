@@ -89,20 +89,20 @@ const updatedAt = computed(() => {
 
 .g1-catalog-meta > div {
   min-width: 0;
-  padding: 12px;
+  padding: var(--g1-space-3);
   background: var(--g1-surface);
 }
 
 .g1-catalog-meta dt {
   color: var(--g1-text-tertiary);
-  font-size: 12px;
+  font-size: var(--g1-text-xs);
 }
 
 .g1-catalog-meta dd {
   margin: 4px 0 0;
   overflow-wrap: anywhere;
   color: var(--g1-text);
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-variant-numeric: tabular-nums;
 }
 

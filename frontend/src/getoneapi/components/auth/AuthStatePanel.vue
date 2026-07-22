@@ -105,7 +105,7 @@ defineEmits<{ retry: [] }>()
 
 .g1-auth-state__title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--g1-text-lg);
   font-weight: 700;
   color: var(--g1-text);
 }
@@ -114,7 +114,7 @@ defineEmits<{ retry: [] }>()
   max-width: 48ch;
   margin: 12px auto 0;
   color: var(--g1-text-secondary);
-  font-size: 15px;
+  font-size: var(--g1-text-base);
   line-height: 1.6;
 }
 
@@ -123,7 +123,7 @@ defineEmits<{ retry: [] }>()
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--g1-space-3);
   margin-top: 24px;
 }
 
@@ -135,7 +135,7 @@ defineEmits<{ retry: [] }>()
   border-radius: var(--g1-radius-md);
   background: var(--g1-control);
   color: var(--g1-text);
-  font-size: 15px;
+  font-size: var(--g1-text-base);
   font-weight: 600;
   text-decoration: none;
 }

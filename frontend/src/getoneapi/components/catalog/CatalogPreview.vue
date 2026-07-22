@@ -181,7 +181,7 @@ onBeforeUnmount(() => controller?.abort())
 
 .g1-catalog__intro p {
   color: var(--g1-text-tertiary);
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -193,7 +193,7 @@ onBeforeUnmount(() => controller?.abort())
 
 .g1-catalog__tabs {
   display: flex;
-  gap: 4px;
+  gap: var(--g1-space-1);
   overflow-x: auto;
   padding-block: 12px;
   border-bottom: 1px solid var(--g1-divider);

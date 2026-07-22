@@ -120,7 +120,7 @@
   background: var(--g1-surface);
   border-radius: var(--g1-radius-md);
   box-shadow: var(--g1-shadow-raised);
-  padding: 16px;
+  padding: var(--g1-space-4);
 }
 
 [data-surface^='getoneapi-'] .card--raised {
@@ -136,13 +136,13 @@
 
 [data-surface^='getoneapi-'] th,
 [data-surface^='getoneapi-'] td {
-  padding: 12px;
+  padding: var(--g1-space-3);
   text-align: left;
   border-bottom: 1px solid var(--g1-divider);
 }
 
 [data-surface^='getoneapi-'] tbody tr {
-  transition: background-color 100ms ease;
+  transition: background-color var(--g1-duration-fast) var(--g1-ease);
 }
 
 [data-surface^='getoneapi-'] tbody tr:hover {
@@ -156,7 +156,7 @@
   border: none;
   border-radius: var(--g1-radius-md);
   box-shadow: var(--g1-shadow-raised);
-  padding: 24px;
+  padding: var(--g1-space-6);
 }
 
 /* Money and numeric columns use tabular figures for alignment. */

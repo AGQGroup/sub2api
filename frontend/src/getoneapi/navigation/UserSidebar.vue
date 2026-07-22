@@ -212,7 +212,7 @@ async function handleLogout(): Promise<void> {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--g1-text-xs);
   color: var(--g1-text-tertiary);
 }
 
@@ -259,7 +259,7 @@ async function handleLogout(): Promise<void> {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background-color 100ms ease;
+  transition: background-color var(--g1-duration-fast) var(--g1-ease);
   position: relative;
 }
 
@@ -322,13 +322,13 @@ async function handleLogout(): Promise<void> {
   padding: 0 8px;
   border-radius: var(--g1-radius-md);
   color: var(--g1-text-secondary);
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-weight: 500;
   text-decoration: none;
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background-color 100ms ease;
+  transition: background-color var(--g1-duration-fast) var(--g1-ease);
 }
 
 .g1-sidebar__footer-link:hover {

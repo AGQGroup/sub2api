@@ -50,7 +50,7 @@ defineEmits<{ createKey: [] }>()
 
 .g1-key-empty h3 {
   margin: 0 0 8px;
-  font-size: 20px;
+  font-size: var(--g1-text-lg);
   font-weight: 700;
   color: var(--g1-text);
 }
@@ -59,7 +59,7 @@ defineEmits<{ createKey: [] }>()
   max-width: 400px;
   margin: 0 0 24px;
   color: var(--g1-text-secondary);
-  font-size: 15px;
+  font-size: var(--g1-text-base);
   line-height: 1.5;
 }
 
@@ -67,13 +67,13 @@ defineEmits<{ createKey: [] }>()
   display: inline-flex;
   min-height: 44px;
   align-items: center;
-  gap: 8px;
+  gap: var(--g1-space-2);
   padding: 0 20px;
   border: none;
   border-radius: var(--g1-radius-md);
   background: var(--g1-primary);
   color: #ffffff;
-  font-size: 15px;
+  font-size: var(--g1-text-base);
   font-weight: 600;
   cursor: pointer;
 }

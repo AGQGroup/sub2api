@@ -190,7 +190,7 @@ function protocolLabel(platform: string): string {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  gap: var(--g1-space-6);
   padding-block: 20px 12px;
 }
 
@@ -211,7 +211,7 @@ function protocolLabel(platform: string): string {
 .g1-pricing-table__heading dl {
   flex: 0 1 300px;
   color: var(--g1-text-secondary);
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   text-align: right;
 }
 
@@ -231,7 +231,7 @@ function protocolLabel(platform: string): string {
 
 .g1-pricing-table__protocol,
 .g1-pricing-table__clients {
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
 }
 
 .g1-pricing-table table {
@@ -280,7 +280,7 @@ function protocolLabel(platform: string): string {
 .g1-pricing-table__tier strong {
   display: block;
   margin-bottom: 6px;
-  font-size: 12px;
+  font-size: var(--g1-text-xs);
 }
 
 @media (max-width: 1023px) {
@@ -296,7 +296,7 @@ function protocolLabel(platform: string): string {
   .g1-pricing-table th,
   .g1-pricing-table td {
     padding: 10px 6px;
-    font-size: 12px;
+    font-size: var(--g1-text-xs);
   }
 
   .g1-pricing-table th:first-child {

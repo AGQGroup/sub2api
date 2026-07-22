@@ -54,7 +54,7 @@ onBeforeUnmount(() => controller.abort())
   min-height: 64px;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--g1-space-4);
   padding: 8px clamp(16px, 3vw, 40px);
 }
 
@@ -62,13 +62,13 @@ onBeforeUnmount(() => controller.abort())
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--g1-space-2);
 }
 
 .g1-health {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--g1-space-2);
   margin: 0 8px 0 0;
   color: var(--g1-text-secondary);
   font-size: 14px;

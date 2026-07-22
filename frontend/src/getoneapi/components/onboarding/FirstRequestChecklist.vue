@@ -59,7 +59,7 @@ const completedCount = computed(() => steps.value.filter((s) => s.complete).leng
 
 <style scoped>
 .g1-checklist {
-  padding: 24px;
+  padding: var(--g1-space-6);
   border: 1px solid var(--g1-divider);
   border-radius: var(--g1-radius-md);
   background: var(--g1-surface);
@@ -75,13 +75,13 @@ const completedCount = computed(() => steps.value.filter((s) => s.complete).leng
 
 .g1-checklist__title {
   margin: 0;
-  font-size: 17px;
+  font-size: var(--g1-text-md);
   font-weight: 700;
   color: var(--g1-text);
 }
 
 .g1-checklist__progress-text {
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-weight: 600;
   color: var(--g1-text-tertiary);
   font-variant-numeric: tabular-nums;
@@ -99,13 +99,13 @@ const completedCount = computed(() => steps.value.filter((s) => s.complete).leng
   height: 100%;
   border-radius: 2px;
   background: var(--g1-primary);
-  transition: width 300ms ease;
+  transition: width var(--g1-duration-slow) var(--g1-ease);
 }
 
 .g1-checklist__list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--g1-space-1);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -115,7 +115,7 @@ const completedCount = computed(() => steps.value.filter((s) => s.complete).leng
   display: flex;
   min-height: 44px;
   align-items: center;
-  gap: 12px;
+  gap: var(--g1-space-3);
   padding: 6px 0;
 }
 
@@ -150,7 +150,7 @@ const completedCount = computed(() => steps.value.filter((s) => s.complete).leng
 
 .g1-checklist__label {
   flex: 1;
-  font-size: 15px;
+  font-size: var(--g1-text-base);
   font-weight: 500;
   color: var(--g1-text);
 }
@@ -161,7 +161,7 @@ const completedCount = computed(() => steps.value.filter((s) => s.complete).leng
   align-items: center;
   padding: 0 14px;
   border-radius: var(--g1-radius-sm);
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-weight: 600;
   color: var(--g1-primary);
   text-decoration: none;

@@ -148,7 +148,7 @@ const formattedAmount = computed(() => {
   max-width: 48ch;
   margin: 12px auto 0;
   color: var(--g1-text-secondary);
-  font-size: 15px;
+  font-size: var(--g1-text-base);
   line-height: 1.6;
 }
 
@@ -165,13 +165,13 @@ const formattedAmount = computed(() => {
 }
 
 .g1-transaction-state__details dt {
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-weight: 600;
   color: var(--g1-text-secondary);
 }
 
 .g1-transaction-state__details dd {
-  font-size: 15px;
+  font-size: var(--g1-text-base);
   font-weight: 600;
   color: var(--g1-text);
   margin: 0;
@@ -183,7 +183,7 @@ const formattedAmount = computed(() => {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--g1-space-3);
   margin-top: 24px;
 }
 </style>

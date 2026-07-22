@@ -82,7 +82,7 @@ const links = computed(() => getPublicLinks({
 
 .g1-public-home__eyebrow {
   color: var(--g1-text-tertiary);
-  font-size: 13px;
+  font-size: var(--g1-text-sm);
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -110,7 +110,7 @@ const links = computed(() => getPublicLinks({
 .g1-public-home__intro dl div {
   display: grid;
   grid-template-columns: 120px minmax(0, 1fr);
-  gap: 12px;
+  gap: var(--g1-space-3);
   padding: 12px 0;
 }
 
