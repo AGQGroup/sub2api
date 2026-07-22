@@ -163,6 +163,39 @@
   margin-inline: auto;
 }
 
+/* Hard constraint enforcement: legacy utility classes rendered inside a
+   GetOneAPI surface must not violate the visual contract. Radius is capped
+   at 8px, decorative gradients are flattened to the surface token, and
+   oversized backdrop blurs are removed. */
+[data-surface^='getoneapi-'] .rounded-xl,
+[data-surface^='getoneapi-'] .rounded-2xl,
+[data-surface^='getoneapi-'] .rounded-3xl,
+[data-surface^='getoneapi-'] .rounded-full,
+[data-surface^='getoneapi-'] [class*='rounded-xl'],
+[data-surface^='getoneapi-'] [class*='rounded-2xl'],
+[data-surface^='getoneapi-'] [class*='rounded-3xl'] {
+  border-radius: var(--g1-radius-md) !important;
+}
+
+[data-surface^='getoneapi-'] [class*='gradient'],
+[data-surface^='getoneapi-'] .bg-mesh-gradient,
+[data-surface^='getoneapi-'] .shadow-glow {
+  background-image: none !important;
+  background: var(--g1-surface) !important;
+  box-shadow: none !important;
+}
+
+[data-surface^='getoneapi-'] .blur-3xl,
+[data-surface^='getoneapi-'] [class*='blur-2xl'],
+[data-surface^='getoneapi-'] [class*='blur-3xl'] {
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+
+[data-surface^='getoneapi-'] .tracking-tight {
+  letter-spacing: 0 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-surface^='getoneapi-'] *,
   [data-surface^='getoneapi-'] *::before,
