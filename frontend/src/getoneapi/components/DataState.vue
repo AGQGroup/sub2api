@@ -77,24 +77,14 @@ defineEmits<{ retry: [] }>()
 
 [data-error-state='forbidden'] .g1-data-state__icon,
 [data-error-state='error'] .g1-data-state__icon {
-  background: rgb(215 0 21 / 8%);
+  background: var(--g1-danger-tint);
   color: var(--g1-danger);
 }
 
 [data-error-state='rate-limited'] .g1-data-state__icon,
 [data-error-state='maintenance'] .g1-data-state__icon {
-  background: rgb(178 80 0 / 10%);
+  background: var(--g1-warning-tint);
   color: var(--g1-warning);
-}
-
-.dark [data-error-state='forbidden'] .g1-data-state__icon,
-.dark [data-error-state='error'] .g1-data-state__icon {
-  background: rgb(255 69 58 / 12%);
-}
-
-.dark [data-error-state='rate-limited'] .g1-data-state__icon,
-.dark [data-error-state='maintenance'] .g1-data-state__icon {
-  background: rgb(255 159 10 / 12%);
 }
 
 .g1-data-state__title {

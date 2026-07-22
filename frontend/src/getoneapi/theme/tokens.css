@@ -2,6 +2,7 @@
    Only apply under data-surface="getoneapi-*"; admin and legacy pages are unaffected. */
 
 :where([data-surface^='getoneapi-']) {
+  /* ---- Color ---- */
   --g1-canvas: #f5f5f7;
   --g1-surface: #ffffff;
   --g1-surface-raised: #ffffff;
@@ -16,16 +17,70 @@
   --g1-success: #248a3d;
   --g1-warning: #b25000;
   --g1-danger: #d70015;
+
+  /* ---- Tinted fills (icon chips, badges) ---- */
+  --g1-primary-tint: rgb(0 113 227 / 10%);
+  --g1-success-tint: rgb(36 138 61 / 10%);
+  --g1-warning-tint: rgb(178 80 0 / 10%);
+  --g1-danger-tint: rgb(215 0 21 / 8%);
+  --g1-purple-tint: rgb(128 88 199 / 12%);
+  --g1-purple: #8058c7;
+
+  /* ---- Radius ---- */
   --g1-radius-sm: 4px;
   --g1-radius-md: 8px;
+  --g1-radius-pill: 999px;
+
+  /* ---- Shadow scale ---- */
+  --g1-shadow-xs: 0 1px 2px rgb(0 0 0 / 4%);
   --g1-shadow-raised: 0 2px 10px rgb(0 0 0 / 8%);
+  --g1-shadow-lifted: 0 4px 16px rgb(0 0 0 / 10%);
+  --g1-shadow-modal: 0 12px 40px rgb(0 0 0 / 16%);
+
+  /* ---- Typography (SF-style scale) ---- */
+  --g1-font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --g1-text-xs: 12px;
+  --g1-text-sm: 13px;
+  --g1-text-base: 15px;
+  --g1-text-md: 17px;
+  --g1-text-lg: 20px;
+  --g1-text-xl: 28px;
+  --g1-text-hero: 56px;
+  --g1-leading-tight: 1.1;
+  --g1-leading-normal: 1.5;
+  --g1-leading-loose: 1.65;
+
+  /* ---- Spacing scale (4px base) ---- */
+  --g1-space-1: 4px;
+  --g1-space-2: 8px;
+  --g1-space-3: 12px;
+  --g1-space-4: 16px;
+  --g1-space-5: 20px;
+  --g1-space-6: 24px;
+  --g1-space-8: 32px;
+  --g1-space-10: 40px;
+  --g1-space-12: 48px;
+
+  /* ---- Layout ---- */
   --g1-content-max: 1440px;
+  --g1-sidebar-w: 260px;
+  --g1-header-h: 64px;
+  --g1-target: 44px;
+
+  /* ---- Motion ---- */
+  --g1-duration-fast: 100ms;
+  --g1-duration: 150ms;
+  --g1-duration-slow: 300ms;
+  --g1-ease: cubic-bezier(0.2, 0.8, 0.4, 1);
+
   color: var(--g1-text);
   background: var(--g1-canvas);
+  font-family: var(--g1-font-family);
   letter-spacing: 0;
 }
 
 .dark :where([data-surface^='getoneapi-']) {
+  /* ---- Color ---- */
   --g1-canvas: #000000;
   --g1-surface: #1c1c1e;
   --g1-surface-raised: #2c2c2e;
@@ -40,4 +95,18 @@
   --g1-success: #30d158;
   --g1-warning: #ff9f0a;
   --g1-danger: #ff453a;
+
+  /* ---- Tinted fills ---- */
+  --g1-primary-tint: rgb(10 132 255 / 15%);
+  --g1-success-tint: rgb(48 209 88 / 15%);
+  --g1-warning-tint: rgb(255 159 10 / 12%);
+  --g1-danger-tint: rgb(255 69 58 / 12%);
+  --g1-purple-tint: rgb(150 110 215 / 18%);
+  --g1-purple: #a88ade;
+
+  /* ---- Shadow (softer on dark) ---- */
+  --g1-shadow-xs: 0 1px 2px rgb(0 0 0 / 24%);
+  --g1-shadow-raised: 0 2px 10px rgb(0 0 0 / 32%);
+  --g1-shadow-lifted: 0 4px 16px rgb(0 0 0 / 40%);
+  --g1-shadow-modal: 0 12px 40px rgb(0 0 0 / 48%);
 }

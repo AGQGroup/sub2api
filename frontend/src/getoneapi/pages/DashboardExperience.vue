@@ -211,31 +211,18 @@ function formatTime(value?: string): string {
 }
 
 .g1-metric-card__icon--blue {
-  background: rgb(0 113 227 / 10%);
+  background: var(--g1-primary-tint);
   color: var(--g1-primary);
 }
 
 .g1-metric-card__icon--green {
-  background: rgb(36 138 61 / 10%);
+  background: var(--g1-success-tint);
   color: var(--g1-success);
 }
 
 .g1-metric-card__icon--purple {
-  background: rgb(128 88 199 / 12%);
-  color: #8058c7;
-}
-
-.dark .g1-metric-card__icon--blue {
-  background: rgb(10 132 255 / 15%);
-}
-
-.dark .g1-metric-card__icon--green {
-  background: rgb(48 209 88 / 15%);
-}
-
-.dark .g1-metric-card__icon--purple {
-  background: rgb(150 110 215 / 18%);
-  color: #a88ade;
+  background: var(--g1-purple-tint);
+  color: var(--g1-purple);
 }
 
 .g1-metric-card__label {
