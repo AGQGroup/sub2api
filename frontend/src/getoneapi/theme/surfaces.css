@@ -183,6 +183,16 @@
   background-image: none !important;
   background: var(--g1-surface) !important;
   box-shadow: none !important;
+  color: var(--g1-text) !important;
+}
+
+/* Light text designed for gradient backgrounds must remain readable on the
+   flattened surface. The compound attribute selector outranks Tailwind's
+   single-class text color utilities, so descendants inherit the readable
+   surface text token. */
+[data-surface^='getoneapi-'] [class*='gradient'] *,
+[data-surface^='getoneapi-'] .bg-mesh-gradient * {
+  color: inherit;
 }
 
 [data-surface^='getoneapi-'] .blur-3xl,

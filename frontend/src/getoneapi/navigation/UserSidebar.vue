@@ -152,14 +152,21 @@ async function handleLogout(): Promise<void> {
 
 <style scoped>
 .g1-sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
-  z-index: 30;
-  width: 260px;
-  flex-direction: column;
-  border-right: 1px solid var(--g1-divider);
-  background: var(--g1-surface);
-  user-select: none;
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .g1-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 30;
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--g1-divider);
+    background: var(--g1-surface);
+    user-select: none;
+  }
 }
 
 .g1-sidebar__brand {

@@ -50,17 +50,16 @@ function isActive(path: string): boolean {
 
 <style scoped>
 .g1-bottom-nav {
-  position: fixed;
-  inset: auto 0 0 0;
-  z-index: 30;
-  display: grid;
-  border-top: 1px solid var(--g1-divider);
-  background: var(--g1-surface);
-  backdrop-filter: blur(20px);
+  display: none;
 }
 
-@supports not (backdrop-filter: blur(20px)) {
+@media (max-width: 1023px) {
   .g1-bottom-nav {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 30;
+    display: grid;
+    border-top: 1px solid var(--g1-divider);
     background: var(--g1-surface);
   }
 }
