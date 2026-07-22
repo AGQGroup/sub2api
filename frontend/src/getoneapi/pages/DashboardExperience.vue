@@ -2,19 +2,28 @@
   <div data-ui="dashboard-experience" class="g1-dashboard">
     <section data-ui="metrics" class="g1-dashboard__metrics-row">
       <div class="g1-metric-card" data-ui="metric-balance">
-        <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.balance') }}</span>
+        <div class="g1-metric-card__top">
+          <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.balance') }}</span>
+          <span class="g1-metric-card__icon g1-metric-card__icon--blue"><Icon name="creditCard" size="md" aria-hidden="true" /></span>
+        </div>
         <span class="g1-metric-card__value">{{ balanceText }}</span>
       </div>
       <div class="g1-metric-card" data-ui="metric-requests">
-        <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.requestsToday') }}</span>
+        <div class="g1-metric-card__top">
+          <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.requestsToday') }}</span>
+          <span class="g1-metric-card__icon g1-metric-card__icon--green"><Icon name="bolt" size="md" aria-hidden="true" /></span>
+        </div>
         <span class="g1-metric-card__value">{{ formatNumber(stats?.today_requests) }}</span>
       </div>
       <div class="g1-metric-card" data-ui="metric-keys">
-        <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.activeKeys') }}</span>
+        <div class="g1-metric-card__top">
+          <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.activeKeys') }}</span>
+          <span class="g1-metric-card__icon g1-metric-card__icon--purple"><Icon name="key" size="md" aria-hidden="true" /></span>
+        </div>
         <span class="g1-metric-card__value">{{ formatNumber(stats?.active_api_keys) }}</span>
       </div>
       <div class="g1-metric-card" data-ui="metric-health">
-        <div class="g1-metric-card__health-row">
+        <div class="g1-metric-card__top">
           <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.status') }}</span>
           <span class="g1-health-dot" :class="healthClass" aria-hidden="true" />
         </div>
@@ -173,11 +182,60 @@ function formatTime(value?: string): string {
 .g1-metric-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   padding: 20px 24px;
   border: 1px solid var(--g1-divider);
   border-radius: var(--g1-radius-md);
   background: var(--g1-surface);
+  box-shadow: var(--g1-shadow-raised);
+  transition: box-shadow 150ms ease;
+}
+
+.g1-metric-card:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 10%);
+}
+
+.g1-metric-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.g1-metric-card__icon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--g1-radius-sm);
+}
+
+.g1-metric-card__icon--blue {
+  background: rgb(0 113 227 / 10%);
+  color: var(--g1-primary);
+}
+
+.g1-metric-card__icon--green {
+  background: rgb(36 138 61 / 10%);
+  color: var(--g1-success);
+}
+
+.g1-metric-card__icon--purple {
+  background: rgb(128 88 199 / 12%);
+  color: #8058c7;
+}
+
+.dark .g1-metric-card__icon--blue {
+  background: rgb(10 132 255 / 15%);
+}
+
+.dark .g1-metric-card__icon--green {
+  background: rgb(48 209 88 / 15%);
+}
+
+.dark .g1-metric-card__icon--purple {
+  background: rgb(150 110 215 / 18%);
+  color: #a88ade;
 }
 
 .g1-metric-card__label {
@@ -292,6 +350,7 @@ function formatTime(value?: string): string {
   border: 1px solid var(--g1-divider);
   border-radius: var(--g1-radius-md);
   background: var(--g1-surface);
+  box-shadow: var(--g1-shadow-raised);
   overflow: hidden;
 }
 
