@@ -450,6 +450,14 @@ function formatTime(value?: string): string {
   max-width: 160px;
 }
 
+.g1-table tbody tr {
+  transition: background-color 100ms ease;
+}
+
+.g1-table tbody tr:hover {
+  background: var(--g1-control);
+}
+
 .g1-table tr:last-child td {
   border-bottom: none;
 }

@@ -82,16 +82,16 @@ const links = computed(() => getPublicLinks({
   grid-template-areas:
     'facts authentication'
     'catalog authentication';
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
-  gap: 32px 48px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+  gap: 40px 56px;
   align-items: start;
-  padding: 40px clamp(24px, 4vw, 64px) 64px;
+  padding: 48px clamp(24px, 4vw, 64px) 72px;
 }
 
 .g1-auth-facts {
   grid-area: facts;
   min-width: 0;
-  padding-top: 8px;
+  padding-top: 16px;
 }
 
 .g1-auth-eyebrow,
@@ -101,31 +101,34 @@ const links = computed(() => getPublicLinks({
 }
 
 .g1-auth-eyebrow {
-  color: var(--g1-text-tertiary);
+  color: var(--g1-primary);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .g1-auth-facts h1 {
-  margin-top: 8px;
+  margin-top: 12px;
   overflow-wrap: anywhere;
-  font-size: 48px;
-  line-height: 1.08;
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
 .g1-auth-subtitle {
-  max-width: 58ch;
-  margin-top: 12px;
+  max-width: 54ch;
+  margin-top: 16px;
   color: var(--g1-text-secondary);
   font-size: 17px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .g1-auth-facts dl {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 28px 0 0;
+  margin: 36px 0 0;
   border-block: 1px solid var(--g1-divider);
 }
 
@@ -226,7 +229,7 @@ const links = computed(() => getPublicLinks({
   }
 
   .g1-auth-facts h1 {
-    font-size: 32px;
+    font-size: 34px;
   }
 
   .g1-auth-facts dl {

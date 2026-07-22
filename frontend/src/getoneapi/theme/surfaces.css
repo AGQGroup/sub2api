@@ -2,12 +2,15 @@
    Every selector is scoped under [data-surface^='getoneapi-'] so admin and
    legacy pages are completely unaffected. */
 
-/* Only enforce the generic control appearance on unstyled buttons and
-   explicit GetOneAPI variants. Component-scoped controls (theme toggle,
-   segmented tabs, icon buttons with Tailwind classes) keep their own look. */
+/* 44px interactive minimum applies to every button on the surface; the
+   generic control appearance (padding/background/radius) only styles
+   unstyled buttons and explicit .btn so component controls keep their look. */
+[data-surface^='getoneapi-'] button {
+  min-height: 44px;
+}
+
 [data-surface^='getoneapi-'] button:not([class]),
 [data-surface^='getoneapi-'] .btn {
-  min-height: 44px;
   padding: 0 16px;
   border-radius: var(--g1-radius-md);
   background: var(--g1-control);
@@ -136,6 +139,14 @@
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid var(--g1-divider);
+}
+
+[data-surface^='getoneapi-'] tbody tr {
+  transition: background-color 100ms ease;
+}
+
+[data-surface^='getoneapi-'] tbody tr:hover {
+  background: var(--g1-control);
 }
 
 [data-surface^='getoneapi-'] dialog,

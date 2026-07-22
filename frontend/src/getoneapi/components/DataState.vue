@@ -55,32 +55,51 @@ defineEmits<{ retry: [] }>()
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60px 24px;
+  padding: 56px 24px;
   text-align: center;
 }
 
 .g1-data-state__icon {
   display: flex;
+  width: 72px;
+  height: 72px;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 20px;
+  border-radius: 50%;
+  background: var(--g1-control);
   color: var(--g1-text-tertiary);
+}
+
+[data-error-state='empty'] .g1-data-state__icon {
+  background: var(--g1-control);
 }
 
 [data-error-state='forbidden'] .g1-data-state__icon,
 [data-error-state='error'] .g1-data-state__icon {
+  background: rgb(215 0 21 / 8%);
   color: var(--g1-danger);
 }
 
-[data-error-state='rate-limited'] .g1-data-state__icon {
+[data-error-state='rate-limited'] .g1-data-state__icon,
+[data-error-state='maintenance'] .g1-data-state__icon {
+  background: rgb(178 80 0 / 10%);
   color: var(--g1-warning);
 }
 
-[data-error-state='maintenance'] .g1-data-state__icon {
-  color: var(--g1-warning);
+.dark [data-error-state='forbidden'] .g1-data-state__icon,
+.dark [data-error-state='error'] .g1-data-state__icon {
+  background: rgb(255 69 58 / 12%);
+}
+
+.dark [data-error-state='rate-limited'] .g1-data-state__icon,
+.dark [data-error-state='maintenance'] .g1-data-state__icon {
+  background: rgb(255 159 10 / 12%);
 }
 
 .g1-data-state__title {
   margin: 0;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--g1-text);
 }
@@ -99,6 +118,6 @@ defineEmits<{ retry: [] }>()
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 22px;
 }
 </style>
