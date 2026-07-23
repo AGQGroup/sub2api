@@ -281,7 +281,7 @@ async function handleLogout(): Promise<void> {
 }
 
 .g1-sidebar__link--active {
-  background: var(--g1-control);
+  background: var(--g1-primary-tint);
   font-weight: 600;
   color: var(--g1-primary);
 }

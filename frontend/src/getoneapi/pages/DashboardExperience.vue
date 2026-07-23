@@ -2,32 +2,34 @@
   <div data-ui="dashboard-experience" class="g1-dashboard">
     <section data-ui="metrics" class="g1-dashboard__metrics-row">
       <div class="g1-metric-card" data-ui="metric-balance">
-        <div class="g1-metric-card__top">
+        <span class="g1-metric-card__icon g1-metric-card__icon--blue"><Icon name="creditCard" size="lg" aria-hidden="true" /></span>
+        <div class="g1-metric-card__body">
           <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.balance') }}</span>
-          <span class="g1-metric-card__icon g1-metric-card__icon--blue"><Icon name="creditCard" size="md" aria-hidden="true" /></span>
+          <span class="g1-metric-card__value">{{ balanceText }}</span>
         </div>
-        <span class="g1-metric-card__value">{{ balanceText }}</span>
       </div>
       <div class="g1-metric-card" data-ui="metric-requests">
-        <div class="g1-metric-card__top">
+        <span class="g1-metric-card__icon g1-metric-card__icon--green"><Icon name="bolt" size="lg" aria-hidden="true" /></span>
+        <div class="g1-metric-card__body">
           <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.requestsToday') }}</span>
-          <span class="g1-metric-card__icon g1-metric-card__icon--green"><Icon name="bolt" size="md" aria-hidden="true" /></span>
+          <span class="g1-metric-card__value">{{ formatNumber(stats?.today_requests) }}</span>
         </div>
-        <span class="g1-metric-card__value">{{ formatNumber(stats?.today_requests) }}</span>
       </div>
       <div class="g1-metric-card" data-ui="metric-keys">
-        <div class="g1-metric-card__top">
+        <span class="g1-metric-card__icon g1-metric-card__icon--purple"><Icon name="key" size="lg" aria-hidden="true" /></span>
+        <div class="g1-metric-card__body">
           <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.activeKeys') }}</span>
-          <span class="g1-metric-card__icon g1-metric-card__icon--purple"><Icon name="key" size="md" aria-hidden="true" /></span>
+          <span class="g1-metric-card__value">{{ formatNumber(stats?.active_api_keys) }}</span>
         </div>
-        <span class="g1-metric-card__value">{{ formatNumber(stats?.active_api_keys) }}</span>
       </div>
       <div class="g1-metric-card" data-ui="metric-health">
-        <div class="g1-metric-card__top">
+        <div class="g1-metric-card__body">
           <span class="g1-metric-card__label">{{ t('getoneapi.dashboard.status') }}</span>
-          <span class="g1-health-dot" :class="healthClass" aria-hidden="true" />
+          <span class="g1-metric-card__value g1-metric-card__value--small">
+            <span class="g1-health-dot" :class="healthClass" aria-hidden="true" />
+            {{ healthLabel }}
+          </span>
         </div>
-        <span class="g1-metric-card__value g1-metric-card__value--small">{{ healthLabel }}</span>
       </div>
     </section>
 
@@ -70,8 +72,20 @@
         <div v-for="r in 3" :key="r" class="g1-table-row-skel" />
       </div>
       <div v-else-if="!recentUsage?.length" class="g1-card-empty">
-        <Icon name="inbox" size="lg" aria-hidden="true" class="g1-card-empty__icon" />
-        <p>{{ t('getoneapi.dashboard.noRequests') }}</p>
+        <span class="g1-card-empty__icon-ring" aria-hidden="true">
+          <Icon name="chartBar" size="lg" />
+        </span>
+        <p class="g1-card-empty__title">{{ t('getoneapi.dashboard.noRequests') }}</p>
+        <p class="g1-card-empty__desc">{{ t('getoneapi.dashboard.noRecentUsage') }}</p>
+        <button
+          type="button"
+          class="g1-card-empty__cta"
+          data-ui="action-create-key"
+          @click="$emit('createKey')"
+        >
+          <Icon name="plus" size="sm" aria-hidden="true" />
+          {{ t('getoneapi.dashboard.createYourFirstKey') }}
+        </button>
       </div>
       <table v-else class="g1-table">
         <thead>
@@ -181,18 +195,20 @@ function formatTime(value?: string): string {
 
 .g1-metric-card {
   display: flex;
-  flex-direction: column;
-  gap: var(--g1-space-2);
-  padding: 20px 24px;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--g1-space-4);
+  padding: var(--g1-space-5) var(--g1-space-6);
   border: 1px solid var(--g1-divider);
   border-radius: var(--g1-radius-md);
   background: var(--g1-surface);
   box-shadow: var(--g1-shadow-raised);
-  transition: box-shadow var(--g1-duration) var(--g1-ease);
+  transition: box-shadow var(--g1-duration) var(--g1-ease), transform var(--g1-duration) var(--g1-ease);
 }
 
 .g1-metric-card:hover {
-  box-shadow: 0 4px 16px rgb(0 0 0 / 10%);
+  box-shadow: var(--g1-shadow-lifted);
+  transform: translateY(-1px);
 }
 
 .g1-metric-card__top {
@@ -203,11 +219,12 @@ function formatTime(value?: string): string {
 
 .g1-metric-card__icon {
   display: flex;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   align-items: center;
   justify-content: center;
-  border-radius: var(--g1-radius-sm);
+  border-radius: var(--g1-radius-md);
+  flex-shrink: 0;
 }
 
 .g1-metric-card__icon--blue {
@@ -229,21 +246,33 @@ function formatTime(value?: string): string {
   font-size: var(--g1-text-xs);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--g1-text-tertiary);
 }
 
+.g1-metric-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--g1-space-1);
+  min-width: 0;
+}
+
 .g1-metric-card__value {
-  font-size: var(--g1-text-xl);
+  font-size: 34px;
   font-weight: 700;
   color: var(--g1-text);
   font-variant-numeric: tabular-nums;
-  line-height: 1.1;
+  line-height: var(--g1-leading-tight);
+  letter-spacing: -0.01em;
 }
 
 .g1-metric-card__value--small {
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: var(--g1-space-2);
+  font-size: var(--g1-text-lg);
   font-weight: 600;
+  letter-spacing: 0;
 }
 
 .g1-metric-card__health-row {
@@ -389,14 +418,55 @@ function formatTime(value?: string): string {
   flex-direction: column;
   align-items: center;
   gap: var(--g1-space-3);
-  padding: 48px 24px;
-  color: var(--g1-text-tertiary);
+  padding: var(--g1-space-12) var(--g1-space-6);
 }
 
-.g1-card-empty p {
+.g1-card-empty__icon-ring {
+  display: flex;
+  width: 64px;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--g1-primary-tint);
+  color: var(--g1-primary);
+  margin-bottom: var(--g1-space-1);
+}
+
+.g1-card-empty__title {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--g1-text-base);
+  font-weight: 600;
+  color: var(--g1-text);
+}
+
+.g1-card-empty__desc {
+  margin: 0;
+  font-size: var(--g1-text-sm);
   color: var(--g1-text-secondary);
+  max-width: 40ch;
+  text-align: center;
+}
+
+.g1-card-empty__cta {
+  display: inline-flex;
+  min-height: var(--g1-target);
+  align-items: center;
+  gap: var(--g1-space-2);
+  margin-top: var(--g1-space-2);
+  padding: 0 var(--g1-space-5);
+  border-radius: var(--g1-radius-md);
+  border: none;
+  background: var(--g1-primary);
+  color: #ffffff;
+  font-size: var(--g1-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--g1-duration) var(--g1-ease);
+}
+
+.g1-card-empty__cta:hover {
+  background: var(--g1-primary-hover);
 }
 
 .g1-table {
