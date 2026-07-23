@@ -2,7 +2,7 @@
   <AppLayout>
     <TablePageLayout data-ui="available-channels-page">
       <template #filters>
-        <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+        <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-start" data-ui="channels-filters">
           <div class="flex flex-1 flex-wrap items-center gap-3">
             <div class="relative w-full sm:w-80">
               <Icon
@@ -15,6 +15,7 @@
                 type="text"
                 :placeholder="t('availableChannels.searchPlaceholder')"
                 class="input pl-10"
+                data-ui="channels-search"
               />
             </div>
           </div>
@@ -25,6 +26,7 @@
               :disabled="loading"
               class="btn btn-secondary"
               :title="t('common.refresh', 'Refresh')"
+              data-ui="channels-refresh"
             >
               <Icon name="refresh" size="md" :class="loading ? 'animate-spin' : ''" />
             </button>
@@ -33,6 +35,7 @@
       </template>
 
       <template #table>
+        <div data-ui="channels-table">
         <AvailableChannelsTable
           :columns="columnLabels"
           :rows="filteredChannels"
@@ -43,6 +46,7 @@
           :no-models-label="t('availableChannels.noModels')"
           :empty-label="t('availableChannels.empty')"
         />
+        </div>
       </template>
     </TablePageLayout>
   </AppLayout>

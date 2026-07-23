@@ -5,6 +5,7 @@
       data-ui="profile-page"
       class="mx-auto max-w-[950px] space-y-6"
     >
+      <div data-ui="profile-identity">
       <ProfileInfoCard
         :user="user"
         :linuxdo-enabled="linuxdoOAuthEnabled"
@@ -15,10 +16,12 @@
         :wechat-open-enabled="wechatOAuthOpenEnabled"
         :wechat-mp-enabled="wechatOAuthMPEnabled"
       />
+      </div>
 
       <div
         v-if="contactInfo"
         class="card border-primary-200 bg-primary-50 p-6 dark:bg-primary-900/20"
+        data-ui="profile-contact"
       >
         <div class="flex items-center gap-4">
           <div class="rounded-xl bg-primary-100 p-3 text-primary-600">
@@ -33,8 +36,11 @@
         </div>
       </div>
 
+      <div data-ui="profile-security">
       <ProfilePasswordForm />
+      </div>
 
+      <div data-ui="profile-notifications">
       <ProfileBalanceNotifyCard
         v-if="user && balanceLowNotifyEnabled"
         :enabled="user.balance_notify_enabled ?? true"
@@ -43,8 +49,11 @@
         :system-default-threshold="systemDefaultThreshold"
         :user-email="user.email"
       />
+      </div>
 
+      <div data-ui="profile-2fa">
       <ProfileTotpCard />
+      </div>
     </div>
   </AppLayout>
 </template>
