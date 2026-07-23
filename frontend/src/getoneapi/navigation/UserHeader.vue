@@ -1,14 +1,13 @@
 <template>
   <header class="g1-user-header">
-    <div class="g1-user-header__left" />
-    <div class="g1-user-header__center">
+    <div class="g1-user-header__inner">
       <h1 data-ui="user-page-title" class="g1-user-header__title">
         {{ pageTitle }}
       </h1>
-    </div>
-    <div class="g1-user-header__right">
-      <ThemeModeControl />
-      <LanguageMenu />
+      <div class="g1-user-header__right">
+        <ThemeModeControl />
+        <LanguageMenu />
+      </div>
     </div>
   </header>
 </template>
@@ -37,25 +36,17 @@ const pageTitle = computed(() => {
   position: sticky;
   top: 0;
   z-index: 20;
-  display: flex;
-  min-height: 64px;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--g1-space-2);
-  padding: 0 clamp(12px, 3vw, 40px);
   border-bottom: 1px solid var(--g1-divider);
   background: var(--g1-surface);
 }
 
-.g1-user-header__left {
-  display: none;
-}
-
-.g1-user-header__center {
-  flex: 1;
-  min-width: 0;
+.g1-user-header__inner {
   display: flex;
-  justify-content: flex-start;
+  min-height: var(--g1-header-h);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--g1-space-2);
+  padding: 0 clamp(16px, 3vw, 40px);
 }
 
 .g1-user-header__title {
@@ -76,16 +67,14 @@ const pageTitle = computed(() => {
 }
 
 @media (min-width: 1024px) {
-  .g1-user-header__center {
-    justify-content: center;
+  .g1-user-header__inner {
+    max-width: 1200px;
   }
-  .g1-user-header__left {
-    display: block;
-    width: 100px;
-  }
-  .g1-user-header__right {
-    min-width: 100px;
-    justify-content: flex-end;
+}
+
+@media (min-width: 1920px) {
+  .g1-user-header__inner {
+    max-width: 1600px;
   }
 }
 </style>
