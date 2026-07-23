@@ -59,6 +59,12 @@ const pageTitle = computed(() => {
   white-space: nowrap;
 }
 
+@media (max-width: 480px) {
+  .g1-user-header__title {
+    display: none;
+  }
+}
+
 .g1-user-header__right {
   display: flex;
   align-items: center;
