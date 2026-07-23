@@ -127,6 +127,18 @@
   background: var(--g1-surface-raised);
 }
 
+/* Legacy pages rendered inside the user surface share one visual system:
+   cards and bordered containers adopt the g1 rhythm (8px radius, border
+   token, soft shadow) so dashboard and legacy pages read as one product. */
+[data-surface^='getoneapi-user'] .card,
+[data-surface^='getoneapi-user'] .table-scroll-container,
+[data-surface^='getoneapi-user'] [class*='rounded-xl'][class*='border'] {
+  border: 1px solid var(--g1-divider) !important;
+  border-radius: var(--g1-radius-md) !important;
+  box-shadow: var(--g1-shadow-raised) !important;
+  background: var(--g1-surface) !important;
+}
+
 [data-surface^='getoneapi-'] table,
 [data-surface^='getoneapi-'] .table {
   width: 100%;
