@@ -1,5 +1,6 @@
 <template>
   <AppLayout>
+    <section data-ui="monitor-page">
     <MonitorHero
       :overall-status="overallStatus"
       :interval-seconds="DEFAULT_INTERVAL_SECONDS"
@@ -25,6 +26,7 @@
       :title="detailTitle"
       @close="closeDetail"
     />
+    </section>
   </AppLayout>
 </template>
 

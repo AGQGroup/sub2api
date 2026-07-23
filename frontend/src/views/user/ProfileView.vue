@@ -2,6 +2,7 @@
   <AppLayout>
     <div
       data-testid="profile-shell"
+      data-ui="profile-page"
       class="mx-auto max-w-[950px] space-y-6"
     >
       <ProfileInfoCard

@@ -7,6 +7,7 @@ import { resolveSurfaceError } from '@/getoneapi/adapters/surfaceError'
 import DataState from '@/getoneapi/components/DataState.vue'
 import SectionHeader from '@/getoneapi/components/SectionHeader.vue'
 import DefinitionList from '@/getoneapi/components/DefinitionList.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,6 +22,28 @@ function mountOptions() {
     },
   }
 }
+
+describe('shared component surface prop', () => {
+  beforeEach(() => setActivePinia(createPinia()))
+
+  it('EmptyState omits data-surface-variant on legacy default', () => {
+    const wrapper = mount(EmptyState, {
+      props: { title: 'No data' },
+      ...mountOptions(),
+    })
+    expect(wrapper.find('[data-surface-variant]').exists()).toBe(false)
+    expect(wrapper.find('[data-ui="empty-state"]').exists()).toBe(true)
+  })
+
+  it('EmptyState renders data-surface-variant on getoneapi', () => {
+    const wrapper = mount(EmptyState, {
+      props: { title: 'No data', surface: 'getoneapi' },
+      ...mountOptions(),
+    })
+    expect(wrapper.find('[data-surface-variant="getoneapi"]').exists()).toBe(true)
+    expect(wrapper.find('.g1-icon-backdrop').exists()).toBe(true)
+  })
+})
 
 describe('resolveSurfaceError', () => {
   it('maps 403 to forbidden', () => {

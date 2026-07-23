@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isDesktopViewport" class="space-y-3">
+  <div v-if="!isDesktopViewport" class="space-y-3" :data-surface-variant="surface === 'getoneapi' ? 'getoneapi' : undefined" data-ui="data-table-mobile">
     <template v-if="loading">
       <div v-for="i in 5" :key="i" class="rounded-lg border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-900">
         <div class="space-y-3">
@@ -97,6 +97,8 @@
       'actions-expanded': actionsExpanded,
       'is-scrollable': isScrollable
     }"
+    :data-surface-variant="props.surface === 'getoneapi' ? 'getoneapi' : undefined"
+    data-ui="data-table"
   >
     <table class="w-full min-w-max divide-y divide-gray-200 dark:divide-dark-700">
       <thead class="table-header bg-gray-50 dark:bg-dark-800">

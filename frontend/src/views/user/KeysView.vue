@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <TablePageLayout>
+    <TablePageLayout data-ui="keys-page">
       <template #filters>
         <FirstRequestChecklist
           v-if="appStore.getoneapiUserUIEnabled"

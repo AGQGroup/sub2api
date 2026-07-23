@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
+    <div class="space-y-6" data-ui="subscriptions-page">
       <!-- Loading State -->
       <div v-if="loading" class="flex justify-center py-12">
         <div

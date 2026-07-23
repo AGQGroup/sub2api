@@ -1,8 +1,9 @@
 <template>
-  <div class="empty-state">
+  <div class="empty-state" :data-surface-variant="surface === 'getoneapi' ? 'getoneapi' : undefined" data-ui="empty-state">
     <!-- Icon -->
     <div
       class="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-100 dark:bg-dark-800"
+      :class="{ 'g1-icon-backdrop': surface === 'getoneapi' }"
     >
       <slot name="icon">
         <component v-if="icon" :is="icon" class="empty-state-icon h-10 w-10" aria-hidden="true" />
@@ -79,3 +80,10 @@ const displayTitle = computed(() => props.title || t('common.noData'))
 
 defineEmits(['action'])
 </script>
+
+<style scoped>
+[data-surface-variant='getoneapi'] .g1-icon-backdrop {
+  border-radius: 50%;
+  background: var(--g1-control, #f5f5f7);
+}
+</style>

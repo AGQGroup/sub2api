@@ -1,10 +1,12 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
-      <UsageStatsCards :stats="usageStats" :show-account-cost="false" :strike-standard-cost="true" />
+    <section class="space-y-6" data-ui="usage-page">
+      <div data-ui="usage-stats">
+        <UsageStatsCards :stats="usageStats" :show-account-cost="false" :strike-standard-cost="true" />
+      </div>
 
       <div class="space-y-4">
-        <div class="card p-4">
+        <div class="card p-4" data-ui="usage-date-filters">
           <div class="flex flex-wrap items-center gap-4">
             <div class="flex items-center gap-2">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.dashboard.timeRange') }}:</span>
@@ -23,7 +25,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2" data-ui="usage-charts">
           <ModelDistributionChart
             v-model:metric="modelDistributionMetric"
             :model-stats="requestedModelStats"
@@ -66,7 +68,7 @@
         </div>
       </div>
 
-      <div class="card p-6">
+      <div class="card p-6" data-ui="usage-filters">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div v-if="activeTab === 'errors'" class="flex flex-1 flex-wrap items-end gap-4">
             <div class="w-full sm:w-auto sm:min-w-[220px]">
@@ -170,6 +172,16 @@
         </button>
       </div>
 
+      <div v-if="errorViewEnabled" class="flex gap-2 border-b border-gray-200 dark:border-dark-700" data-ui="usage-tabs">
+        <button class="tab" :class="{ 'tab-active': activeTab === 'usage' }" @click="activeTab = 'usage'">
+          {{ t('usage.tabs.usage') }}
+        </button>
+        <button class="tab" :class="{ 'tab-active': activeTab === 'errors' }" @click="switchToErrors">
+          {{ t('usage.tabs.errors') }}
+        </button>
+      </div>
+
+      <div data-ui="usage-table">
       <template v-if="activeTab === 'usage'">
         <UsageTable
           :data="usageLogs"
@@ -207,7 +219,8 @@
         @update:pageSize="onErrorPageSize"
         @ipGeoBatchFailed="handleIpGeoBatchFailed"
       />
-    </div>
+      </div>
+    </section>
   </AppLayout>
 
 </template>
